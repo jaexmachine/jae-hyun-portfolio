@@ -102,6 +102,7 @@ export default function Home() {
           const timeline = gsap.timeline({ defaults: { ease: "power2.inOut" }, scrollTrigger: {
             trigger: scene, start: "top top", end: () => `+=${Math.max(900, window.innerHeight * 1.28)}`,
             scrub: 0.8, pin: true, pinSpacing: true, invalidateOnRefresh: true,
+            onLeave: () => gsap.set(details, { autoAlpha: 1, visibility: "visible" }),
           }});
 
           // Let the thought land first. Then move it into its editorial position
@@ -138,6 +139,7 @@ export default function Home() {
         const timeline = gsap.timeline({ defaults: { ease: "power2.inOut" }, scrollTrigger: {
           trigger: scene, start: "top top", end: () => `+=${Math.max(760, window.innerHeight * 1.12)}`,
           scrub: 0.8, pin: true, pinSpacing: true, invalidateOnRefresh: true,
+          onLeave: () => gsap.set(items, { autoAlpha: 1, visibility: "visible" }),
         }});
         const buildStart = 0.08;
         const buildEnd = 0.80;

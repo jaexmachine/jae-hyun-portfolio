@@ -1,107 +1,85 @@
 <div align="center">
 
-<img src="public/repo-preview.svg" alt="Jae Hyun Tukushima portfolio preview" width="100%" />
+<img src="public/repo-preview.svg" alt="Jae Hyun Tukushima portfolio cover" width="100%" />
 
-# Jae Hyun Tukushima · Portfolio
+# Jae Hyun Tukushima
 
-### A portfolio that assembles itself as you scroll.
+### AI / Data Analyst · Computer Science @ FEU Tech
 
-An interactive portfolio about AI, data, and geospatial systems — built as a sequence of calm, cinematic editing moments.
+**Making sense of what’s next.**
+
+I turn complex data into useful perspective — from spatial AI research to tools that help people learn, decide, and build.
 
 <p>
-  <a href="https://github.com/jaexmachine/jae-hyun-portfolio"><img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-111719?style=flat-square&logo=nextdotjs&logoColor=white"></a>
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white">
-  <img alt="GSAP ScrollTrigger" src="https://img.shields.io/badge/GSAP-ScrollTrigger-88CE02?style=flat-square&logo=greensock&logoColor=111719">
-  <img alt="Responsive" src="https://img.shields.io/badge/Responsive-Yes-9AF0D4?style=flat-square&logoColor=111719">
+  <a href="https://www.linkedin.com/in/jae-hyun-tukushima/">LinkedIn</a> ·
+  <a href="https://github.com/jaexmachine">GitHub</a> ·
+  <a href="mailto:18jaehyun05@gmail.com">Say hello</a>
 </p>
 
-<p><a href="#experience">Explore the experience</a> · <a href="#getting-started">Run it locally</a> · <a href="#accessibility">Accessibility</a></p>
+<p>
+  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-111719?style=flat-square&logo=nextdotjs&logoColor=white">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white">
+  <img alt="GSAP ScrollTrigger" src="https://img.shields.io/badge/GSAP-ScrollTrigger-88CE02?style=flat-square&logo=greensock&logoColor=111719">
+  <img alt="Research in progress" src="https://img.shields.io/badge/GeoAI%20Research-In%20Progress-9AF0D4?style=flat-square">
+</p>
 
 </div>
 
 ---
 
-## The idea
+## Current focus · GeoAI research
 
-The page is its own canvas. Scroll to watch the headline find its place, then see each portfolio section appear under a simulated editor’s cursor. Scroll back to reverse the sequence. When a section is complete, it settles into a readable portfolio before the page continues.
+### Predictive Coastal Subsidence Heatmap Modeling
 
-## Experience
+**Lead researcher · October 2026 — present**
 
-| Moment | What happens |
+Exploring a hybrid spatial-temporal AI pipeline to forecast multi-year land subsidence patterns across Metro Manila’s CAMANAVA corridor. The research brings together geospatial data, deep learning, explainable AI, and a decision-support dashboard.
+
+`ConvLSTM` `Random Forest` `SHAP / XAI` `GeoPandas` `Rasterio` `FastAPI` `Mapbox GL JS`
+
+> Research is in progress. The portfolio presents the work as it is being developed.
+
+## Selected work
+
+| Project | What it does |
 | --- | --- |
-| **The opening** | “Making sense of what’s next.” starts alone at the center, then glides into its final layout. |
-| **The build** | A measured selection frame moves across real page elements. Each detail appears while it is selected. |
-| **The reveal** | The finished section comes together before the pinned scroll releases. |
-| **The return** | Scrolling upward scrubs the same sequence backward. |
+| **Marketplace Intelligence Pipeline** | Turns localized marketplace listings into structured data for pricing and market analysis. |
+| **Canvas LMS Scraper** | Transforms assessment content into a structured, queryable dataset and interactive dashboard. |
 
-The rest of the portfolio tells Jae’s story through ongoing coastal subsidence research, data and automation projects, FEU Tech ACM leadership, academic honors, and technical skills.
+## Building with people
 
-## Built with
-
-- **Next.js + React** for the portfolio app
-- **TypeScript** for the interface and interaction logic
-- **GSAP ScrollTrigger** for pinned, reversible scroll timelines
-- **Custom CSS** for the visual system, responsive layouts, and microinteractions
-
-## Getting started
-
-### Requirements
-
-- Node.js 20.9 or newer
-- npm
-
-### Install and run
-
-```bash
-git clone https://github.com/jaexmachine/jae-hyun-portfolio.git
-cd jae-hyun-portfolio
-npm install
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-### Useful commands
-
-```bash
-npm run dev       # Start the local preview
-npm run build     # Create an optimized production build
-npm run start     # Serve the production build
-npm run typecheck # Check TypeScript types
-```
-
-Development uses `.next-dev/`; production builds use `.next/`, so the two can run without overwriting each other’s assets.
-
-## Accessibility
-
-- Reduced-motion preferences skip the scroll choreography and keep every detail visible.
-- **Skip build** jumps past the construction sequence.
-- Navigation uses regular links and the page remains usable with a keyboard.
-- The content is real HTML, not text baked into an image.
-
-## Project structure
-
-```text
-app/
-  layout.tsx       # Page metadata and global styles
-  page.tsx         # Portfolio content and scroll sequences
-  styles.css       # Visual system and responsive behavior
-public/
-  repo-preview.svg # Repository cover art
-```
-
-## About
-
-**Jae Hyun Tukushima** is an AI / Data Analyst and Computer Science student specializing in Artificial Intelligence at FEU Institute of Technology.
-
-- [LinkedIn](https://www.linkedin.com/in/jae-hyun-tukushima/)
-- [GitHub](https://github.com/jaexmachine)
-- [Email](mailto:18jaehyun05@gmail.com)
-
----
+At the **FEU Tech ACM Student Chapter**, I grew from Junior Officer to Associate Director for Academics, helping make technical learning more accessible and hands-on.
 
 <div align="center">
 
-*An open-ended work in progress.*
+| **200+** | **40+** | **40+ teams** |
+|:---:|:---:|:---:|
+| members reached through DataCamp Donates access | students in peer learning and Data Science workshops | supported at a university hackathon |
+
+</div>
+
+## Recognition
+
+- **Rank 1**, A.Y. 2024–2025 · FEU Institute of Technology
+- **President’s Scholarship**, Highest Honors · 100% tuition coverage
+- **DOST–SEI Scholar** · selected among 10,756 of 89,510 applicants
+
+**Certifications:** Microsoft Azure AI Essentials · GitHub Foundations · ITS Python · Salesforce AI Associate · Working with the OpenAI API · Data Literacy
+
+## Toolkit
+
+| Machine learning | Data & analysis | Cloud & engineering |
+| --- | --- | --- |
+| Python · PyTorch · Scikit-learn · MATLAB · Jupyter | Pandas · SQL · Matplotlib · Seaborn · Google Analytics · Google Sheets | Azure · Git · GitHub · GitHub Actions |
+
+## A portfolio with a pulse
+
+This site is designed to feel like a page being thoughtfully assembled in real time. Scroll to watch the headline settle into place, then follow the editor’s selection frame as each section is revealed. The finished content stays on screen; scroll back to replay the build in reverse.
+
+<div align="center">
+
+**AI · DATA · SPATIAL SYSTEMS · INTELLIGENT AUTOMATION**
+
+*Curious by default. Building with purpose.*
 
 </div>
