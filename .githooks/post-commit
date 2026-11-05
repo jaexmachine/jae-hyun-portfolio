@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+# Keep the selected GitHub branch in sync after every local commit.
+branch=$(git symbolic-ref --quiet --short HEAD) || exit 0
+git push origin "HEAD:refs/heads/$branch"

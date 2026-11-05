@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="640" viewBox="0 0 1440 640" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1440" y2="640" gradientUnits="userSpaceOnUse"><stop stop-color="#182322"/><stop offset=".56" stop-color="#111719"/><stop offset="1" stop-color="#1C2825"/></linearGradient>
+    <linearGradient id="wash" x1="1010" y1="70" x2="1284" y2="584" gradientUnits="userSpaceOnUse"><stop stop-color="#9AF0D4" stop-opacity=".2"/><stop offset="1" stop-color="#9AF0D4" stop-opacity="0"/></linearGradient>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" stroke="#D5EBE0" stroke-opacity=".055"/></pattern>
+    <filter id="shadow" x="730" y="86" width="548" height="482" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="24"/></filter>
+  </defs>
+  <rect width="1440" height="640" rx="20" fill="url(#bg)"/>
+  <rect width="1440" height="640" rx="20" fill="url(#grid)"/>
+  <ellipse cx="1073" cy="345" rx="194" ry="194" fill="url(#wash)" filter="url(#shadow)"/>
+  <path d="M0 84H1440" stroke="#D9E9E2" stroke-opacity=".11"/>
+  <circle cx="73" cy="43" r="5" fill="#F4B993"/><circle cx="91" cy="43" r="5" fill="#F3D27B"/><circle cx="109" cy="43" r="5" fill="#9AF0D4"/>
+  <text x="137" y="48" fill="#A6B4AC" font-family="monospace" font-size="12" letter-spacing="2">JAE HYUN / PORTFOLIO</text>
+  <text x="1220" y="48" fill="#9AF0D4" font-family="monospace" font-size="10" letter-spacing="2">SYSTEM READY</text>
+  <text x="98" y="152" fill="#9AF0D4" font-family="monospace" font-size="12" letter-spacing="2">COMPUTER SCIENCE · ARTIFICIAL INTELLIGENCE</text>
+  <text x="92" y="267" fill="#E9EBED" font-family="Arial, sans-serif" font-size="76" font-weight="600" letter-spacing="-5">Making sense</text>
+  <text x="92" y="350" fill="#E9EBED" font-family="Arial, sans-serif" font-size="76" font-weight="600" letter-spacing="-5">of <tspan fill="#9AF0D4" font-family="Georgia, serif" font-style="italic" font-weight="400">what’s next.</tspan></text>
+  <text x="98" y="407" fill="#A5ADAF" font-family="Arial, sans-serif" font-size="16">AI, data, and geospatial systems — shaped into</text>
+  <text x="98" y="432" fill="#A5ADAF" font-family="Arial, sans-serif" font-size="16">tools and insights people can actually use.</text>
+  <rect x="98" y="470" width="181" height="46" rx="3" fill="#9AF0D4"/>
+  <text x="116" y="498" fill="#18221F" font-family="monospace" font-size="12">EXPLORE THE WORK</text>
+  <path d="M250 493h16m-7-7 7 7-7 7" stroke="#18221F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <ellipse cx="1020" cy="333" rx="267" ry="203" stroke="#B1E1D2" stroke-opacity=".2" transform="rotate(-23 1020 333)"/>
+  <ellipse cx="1020" cy="333" rx="216" ry="156" stroke="#B1E1D2" stroke-opacity=".12" transform="rotate(31 1020 333)"/>
+  <g transform="rotate(2 1025 323)">
+    <rect x="858" y="150" width="334" height="365" rx="4" fill="#1A2424" stroke="#C1E5D7" stroke-opacity=".35"/>
+    <text x="880" y="177" fill="#82918D" font-family="monospace" font-size="9" letter-spacing="1.2">PROFILE / 001</text>
+    <text x="1120" y="177" fill="#9AF0D4" font-family="monospace" font-size="9">● LIVE</text>
+    <rect x="876" y="193" width="298" height="252" fill="#233F3A"/>
+    <path d="M876 363C954 305 1028 320 1090 347c32 14 57 14 84 1v97H876v-82Z" fill="#395D54"/>
+    <path d="M876 395c60-47 118-54 180-36 43 13 75 21 118 1v85H876v-50Z" fill="#233C38"/>
+    <circle cx="1101" cy="265" r="52" fill="#E6BB91" fill-opacity=".9"/>
+    <text x="982" y="333" fill="#E1F2E0" font-family="Georgia, serif" font-size="66">JH</text>
+    <text x="892" y="468" fill="#E0E7E2" font-family="Arial, sans-serif" font-size="14">Jae Hyun Tukushima</text>
+    <text x="892" y="490" fill="#96A49E" font-family="Arial, sans-serif" font-size="11">AI / Data Analyst</text>
+    <text x="1110" y="490" fill="#62736D" font-family="monospace" font-size="9">01 — 04</text>
+  </g>
+  <rect x="1040" y="115" width="183" height="32" rx="3" fill="#202B2B" stroke="#C1E5D7" stroke-opacity=".25"/>
+  <text x="1060" y="135" fill="#9AF0D4" font-family="Arial, sans-serif" font-size="12">✳</text>
+  <text x="1080" y="135" fill="#C5D0C9" font-family="monospace" font-size="10">CURIOUS BY DEFAULT</text>
+  <rect x="777" y="490" width="234" height="34" rx="3" fill="#202B2B" stroke="#C1E5D7" stroke-opacity=".25"/>
+  <path d="M793 508h16" stroke="#9AF0D4"/>
+  <text x="818" y="512" fill="#C5D0C9" font-family="monospace" font-size="9">TURNING PATTERNS INTO PERSPECTIVE</text>
+  <rect x="850" y="142" width="350" height="378" rx="2" stroke="#9AF0D4" stroke-opacity=".75"/>
+  <path d="M845 137h10v10h-10zm350 0h10v10h-10zm-350 374h10v10h-10zm350 0h10v10h-10z" fill="#111719" stroke="#9AF0D4"/>
+  <path d="M1238 408 1258 426l-9 1-4 8-7-27Z" fill="#9AF0D4" stroke="#111719" stroke-width="1.5"/>
+  <rect x="1260" y="432" width="66" height="19" rx="2" fill="#9AF0D4"/>
+  <text x="1267" y="445" fill="#14201C" font-family="monospace" font-size="7">agent.01</text>
+  <text x="98" y="582" fill="#65746D" font-family="monospace" font-size="9" letter-spacing="2">SCROLL TO WATCH IT COME TOGETHER ↓</text>
+  <text x="1194" y="582" fill="#65746D" font-family="monospace" font-size="9" letter-spacing="1">MANILA, PHILIPPINES</text>
+</svg>
