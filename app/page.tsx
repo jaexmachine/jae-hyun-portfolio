@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -69,6 +70,23 @@ export default function Home() {
   const [ready, setReady] = useState(false);
   const [toast, setToast] = useState("");
   const [activeNav, setActiveNav] = useState("research");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem("portfolio-theme");
+    const initialTheme = savedTheme === "light" || savedTheme === "dark"
+      ? savedTheme
+      : window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+    setTheme(initialTheme);
+    document.documentElement.dataset.theme = initialTheme;
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    document.documentElement.dataset.theme = nextTheme;
+    window.localStorage.setItem("portfolio-theme", nextTheme);
+  };
 
   useEffect(() => {
     const sections = ["research", "about", "experience", "contact"]
@@ -235,9 +253,9 @@ export default function Home() {
   return <main ref={root}>
     <div className="ambient-orb orb-a" /><div className="ambient-orb orb-b" />
     <header className="topbar">
-      <a className="brand" href="#home" aria-label="Jae Hyun home"><span className="brand-mark">j<span>.</span></span><span className="brand-name">jae hyun<br /><small>PORTFOLIO / 2026</small></span></a>
+      <a className="brand" href="#home" aria-label="Jae Hyun home"><span className="brand-mark"><Image className="brand-logo brand-logo-light" src="/rocket-j-light.png" alt="" width={1280} height={1280} /><Image className="brand-logo brand-logo-dark" src="/rocket-j-dark.png" alt="" width={1280} height={1280} priority /></span><span className="brand-name">jae hyun<br /><small>PORTFOLIO / 2026</small></span></a>
       <nav className="flex items-center gap-2 sm:gap-3 md:gap-8" aria-label="Main navigation"><a className={activeNav === "research" ? "is-active" : ""} aria-current={activeNav === "research" ? "location" : undefined} href="#research" onClick={() => setActiveNav("research")}>Work</a><a className={activeNav === "about" ? "is-active" : ""} aria-current={activeNav === "about" ? "location" : undefined} href="#about" onClick={() => setActiveNav("about")}>About</a><a className={activeNav === "experience" ? "is-active" : ""} aria-current={activeNav === "experience" ? "location" : undefined} href="#experience" onClick={() => setActiveNav("experience")}>Journey</a><a className={activeNav === "contact" ? "is-active" : ""} aria-current={activeNav === "contact" ? "location" : undefined} href="#contact" onClick={() => setActiveNav("contact")}>Contact</a></nav>
-      <div className="top-actions"><span className="availability"><i /> OPEN TO OPPORTUNITIES</span><a className="contact-pill" href="#contact">Let’s talk <Arrow diagonal /></a></div>
+      <div className="top-actions"><span className="availability"><i /> OPEN TO OPPORTUNITIES</span><button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} aria-pressed={theme === "light"} title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}><span aria-hidden="true">{theme === "dark" ? "☼" : "☾"}</span></button><a className="contact-pill" href="#contact">Let’s talk <Arrow diagonal /></a></div>
     </header>
 
     <Scene id="home" className="hero-scene">
@@ -315,7 +333,7 @@ export default function Home() {
     </Scene>
 
     <section className="contact-section" id="contact"><div className="contact-glow"/><div className="contact-inner"><SceneTag n="07">NEXT, LET’S MAKE SOMETHING USEFUL</SceneTag><h2>Have a good<br />question? <span className="serif-italic">I’m in.</span></h2><p>Open to opportunities in AI, data, and thoughtful technology.</p><button className="button button-primary email-button" onClick={copyEmail}>Get in touch <Arrow /></button><div className="contact-links"><a href="mailto:18jaehyun05@gmail.com">18jaehyun05@gmail.com <Arrow diagonal /></a><a href="https://www.linkedin.com/in/jae-hyun-tukushima/" target="_blank" rel="noreferrer">LinkedIn <Arrow diagonal /></a><a href="https://github.com/jaexmachine" target="_blank" rel="noreferrer">GitHub <Arrow diagonal /></a></div><div className="contact-meta"><span>MANILA, PHILIPPINES</span><span>BUILT WITH CARE · 2026</span></div></div></section>
-    <footer className="footer"><a className="brand" href="#home"><span className="brand-mark">j<span>.</span></span><span className="brand-name">jae hyun<br/><small>PORTFOLIO / 2026</small></span></a><span>AN OPEN-ENDED WORK IN PROGRESS <i>✳</i></span><a href="#home">BACK TO TOP ↑</a></footer>
+    <footer className="footer"><a className="brand" href="#home" aria-label="Back to Jae Hyun home"><span className="brand-mark"><Image className="brand-logo brand-logo-light" src="/rocket-j-light.png" alt="" width={1280} height={1280} /><Image className="brand-logo brand-logo-dark" src="/rocket-j-dark.png" alt="" width={1280} height={1280} /></span><span className="brand-name">jae hyun<br/><small>PORTFOLIO / 2026</small></span></a><span>AN OPEN-ENDED WORK IN PROGRESS <i>✳</i></span><a href="#home">BACK TO TOP ↑</a></footer>
     <button className="skip-build" onClick={finishBuild} aria-label="Skip the build animation">Skip build <span>↗</span></button>
     <div className={`toast ${toast ? "show" : ""}`} role="status" aria-live="polite">{toast}<span>✓</span></div>
   </main>;
