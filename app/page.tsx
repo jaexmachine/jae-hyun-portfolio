@@ -60,8 +60,9 @@ export default function Home() {
         const frame = scene.querySelector<HTMLElement>(".edit-selection");
         const cursors = [scene.querySelector<HTMLElement>(".cursor-one"), scene.querySelector<HTMLElement>(".cursor-two")];
         const progressLine = scene.querySelector<HTMLElement>(".scene-progress i");
+        const overlayLayer = scene.querySelector<HTMLElement>(".scene-surface") ?? scene;
         const box = (el: HTMLElement) => {
-          const s = scene.getBoundingClientRect(), r = el.getBoundingClientRect();
+          const s = overlayLayer.getBoundingClientRect(), r = el.getBoundingClientRect();
           return { x: r.left - s.left, y: r.top - s.top, width: r.width, height: r.height };
         };
         const boxProps = (el: HTMLElement) => ({
@@ -121,7 +122,6 @@ export default function Home() {
             if (cursors[0]) timeline.to(cursors[0], { ...pointProps(item), autoAlpha: 1, duration: step * 0.55 }, startAt);
             if (cursors[1] && next) timeline.to(cursors[1], { ...pointProps(next), autoAlpha: 0.84, duration: step * 0.68 }, startAt + step * 0.12);
             timeline.to(item, { autoAlpha: 1, visibility: "visible", duration: step * 0.3, ease: "power1.out" }, startAt + step * 0.62);
-            timeline.to(item, { autoAlpha: 0, duration: step * 0.08, ease: "power1.in" }, startAt + step * 0.92);
           });
           timeline.to(details, { autoAlpha: 1, visibility: "visible", duration: 0.12, stagger: 0.012, ease: "power2.out" }, buildEnd + 0.04)
             .to(frame, { autoAlpha: 0, scale: 1.025, duration: 0.12 }, buildEnd + 0.04)
@@ -154,10 +154,9 @@ export default function Home() {
           if (cursors[0]) timeline.to(cursors[0], { ...pointProps(item), autoAlpha: 1, duration: step * 0.55 }, startAt);
           if (cursors[1] && next) timeline.to(cursors[1], { ...pointProps(next), autoAlpha: 0.84, duration: step * 0.7 }, startAt + step * 0.12);
 
-          // Reveal only while the agent is working on this element, then clear it
-          // again so the next selection reads as a fresh construction step.
+          // Once selected, keep the real page element assembled while the agent
+          // moves on to the next one.
           timeline.to(item, { autoAlpha: 1, visibility: "visible", duration: step * 0.28, ease: "power1.out" }, startAt + step * 0.62);
-          timeline.to(item, { autoAlpha: 0, duration: step * 0.08, ease: "power1.in" }, startAt + step * 0.92);
         });
         timeline.to(items, { autoAlpha: 1, visibility: "visible", duration: 0.12, stagger: 0.012, ease: "power2.out" }, buildEnd + 0.04)
           .to(frame, { autoAlpha: 0, scale: 1.025, duration: 0.12 }, buildEnd + 0.04)
