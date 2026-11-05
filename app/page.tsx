@@ -45,6 +45,25 @@ function SceneTag({ n, children }: { n: string; children: React.ReactNode }) {
   return <div className="scene-tag"><span>{n}</span><span className="tag-dot" />{children}</div>;
 }
 
+function ProjectDisclosure({ id, children }: { id: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const hasMounted = useRef(false);
+
+  useLayoutEffect(() => {
+    if (hasMounted.current) ScrollTrigger.refresh();
+    else hasMounted.current = true;
+  }, [open]);
+
+  return <div className={`project-disclosure ${open ? "is-open" : ""}`}>
+    <button className="see-more-button inline-flex items-center gap-2 transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4" type="button" aria-expanded={open} aria-controls={`${id}-details`} onClick={() => setOpen((value) => !value)}>
+      {open ? "See less" : "See more"}<span aria-hidden="true">{open ? "−" : "↗"}</span>
+    </button>
+    <div className="project-extra" id={`${id}-details`} aria-hidden={!open}>
+      <div className="project-extra-inner">{children}</div>
+    </div>
+  </div>;
+}
+
 export default function Home() {
   const root = useRef<HTMLElement>(null);
   const [ready, setReady] = useState(false);
@@ -118,7 +137,7 @@ export default function Home() {
           details.forEach((item, i) => {
             const startAt = buildStart + i * step;
             const next = details[i + 1];
-            timeline.to(frame, { ...boxProps(item), autoAlpha: 0.96, scale: 1, borderColor: i % 2 ? "#c2b7ff" : "#99f1d5", duration: step * 0.58 }, startAt);
+            timeline.to(frame, { ...boxProps(item), autoAlpha: 0.96, scale: 1, borderColor: i % 2 ? "#c2b7ff" : "#83b6ff", duration: step * 0.58 }, startAt);
             if (cursors[0]) timeline.to(cursors[0], { ...pointProps(item), autoAlpha: 1, duration: step * 0.55 }, startAt);
             if (cursors[1] && next) timeline.to(cursors[1], { ...pointProps(next), autoAlpha: 0.84, duration: step * 0.68 }, startAt + step * 0.12);
             timeline.to(item, { autoAlpha: 1, visibility: "visible", duration: step * 0.3, ease: "power1.out" }, startAt + step * 0.62);
@@ -147,7 +166,7 @@ export default function Home() {
         items.forEach((item, i) => {
           const startAt = buildStart + i * step;
           const next = items[i + 1];
-          const color = i % 2 ? "#c2b7ff" : "#99f1d5";
+          const color = i % 2 ? "#c2b7ff" : "#83b6ff";
 
           // The frame glides from element to element, then lands on its exact DOM bounds.
           timeline.to(frame, { ...boxProps(item), autoAlpha: 0.96, scale: 1, borderColor: color, duration: step * 0.58 }, startAt);
@@ -160,8 +179,8 @@ export default function Home() {
         });
         timeline.to(items, { autoAlpha: 1, visibility: "visible", duration: 0.12, stagger: 0.012, ease: "power2.out" }, buildEnd + 0.04)
           .to(frame, { autoAlpha: 0, scale: 1.025, duration: 0.12 }, buildEnd + 0.04)
-          .to(cursors, { autoAlpha: 0, duration: 0.12 }, buildEnd + 0.04)
-          .to(progressLine, { scaleX: 1, duration: 0.98, ease: "none" }, 0);
+          .to(cursors, { autoAlpha: 0, duration: 0.12 }, buildEnd + 0.04);
+        if (progressLine) timeline.to(progressLine, { scaleX: 1, duration: 0.98, ease: "none" }, 0);
       });
       gsap.fromTo(".ambient-orb", { y: 0 }, { y: -110, ease: "none", scrollTrigger: { trigger: root.current, start: "top top", end: "bottom bottom", scrub: 1 } });
       setReady(true);
@@ -196,7 +215,7 @@ export default function Home() {
     <div className="ambient-orb orb-a" /><div className="ambient-orb orb-b" />
     <header className="topbar">
       <a className="brand" href="#home" aria-label="Jae Hyun home"><span className="brand-mark">j<span>.</span></span><span className="brand-name">jae hyun<br /><small>PORTFOLIO / 2026</small></span></a>
-      <nav aria-label="Main navigation"><a href="#research">Work</a><a href="#about">About</a><a href="#experience">Journey</a></nav>
+      <nav className="flex items-center gap-2 sm:gap-3 md:gap-8" aria-label="Main navigation"><a href="#research">Work</a><a href="#about">About</a><a href="#experience">Journey</a><a href="#contact">Contact</a></nav>
       <div className="top-actions"><span className="availability"><i /> OPEN TO OPPORTUNITIES</span><a className="contact-pill" href="#contact">Let’s talk <Arrow diagonal /></a></div>
     </header>
 
@@ -232,7 +251,7 @@ export default function Home() {
         <div className="section-heading"><div><SceneTag n="02">FEATURED RESEARCH</SceneTag><h2 data-build-item>Where data<br />meets <span className="serif-italic">place.</span></h2></div><p data-build-item className="section-intro">A work in progress, driven by a question worth mapping: how might we better understand the ground beneath our cities?</p></div>
         <article className="research-card" data-build-item>
           <div className="research-visual"><div className="map-grid"/><div className="map-ring ring-one"/><div className="map-ring ring-two"/><div className="map-ring ring-three"/><div className="map-line line-one"/><div className="map-line line-two"/><div className="map-hotspot"><i/></div><span className="map-label label-one">CAMANAVA</span><span className="map-label label-two">METRO MANILA</span><div className="map-legend"><i/>SPATIAL SIGNAL / 001</div><div className="map-axis">N<br/>↑</div></div>
-          <div className="research-detail"><div className="research-topline"><span>01 / RESEARCH</span><span className="status-chip"><i/> IN PROGRESS</span></div><h3>Predictive Coastal<br />Subsidence Heatmap<br /><em>Modeling</em></h3><p>Architecting a hybrid spatial-temporal AI pipeline to forecast multi-year land subsidence trajectories across Metro Manila’s CAMANAVA corridor.</p><div className="research-bottom"><div className="tag-list"><span>ConvLSTM</span><span>Random Forest</span><span>SHAP / XAI</span><span>GeoPandas</span><span>FastAPI</span><span>Mapbox GL JS</span></div><div className="research-meta"><span>LEAD RESEARCHER</span><span>OCT 2026 — PRESENT</span></div></div></div>
+          <div className="research-detail"><div className="research-topline"><span>01 / RESEARCH</span><span className="status-chip"><i/> IN PROGRESS</span></div><h3>Predictive Coastal<br />Subsidence Heatmap<br /><em>Modeling</em></h3><p>Architecting a hybrid spatial-temporal AI pipeline to forecast multi-year land subsidence trajectories across Metro Manila’s CAMANAVA corridor.</p><div className="research-bottom"><div className="tag-list"><span>ConvLSTM</span><span>Random Forest</span><span>SHAP / XAI</span><span>GeoPandas</span><span>FastAPI</span><span>Mapbox GL JS</span></div><div className="research-meta"><span>LEAD RESEARCHER</span><span>OCT 2026 — PRESENT</span></div></div><ProjectDisclosure id="geoai"><div className="details-grid grid grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2"><div><span>APPROACH</span><p>A hybrid pipeline pairing ConvLSTM with Random Forest to study spatial and temporal patterns.</p></div><div><span>DECISION SUPPORT</span><p>A dashboard is being designed for 2D risk heatmaps, SHAP feature attributions, and localized diagnostic cards.</p></div></div><p className="details-footnote">Ongoing research · results and model performance are not yet final.</p></ProjectDisclosure></div>
           <span className="resize-caption">AI EDITING · SECTION 02</span>
         </article>
         <div className="section-bottomline"><span>SCROLL TO CONTINUE BUILD</span><span>01 — 03 <Arrow diagonal /></span></div>
@@ -243,7 +262,7 @@ export default function Home() {
       <div className="section-wrap"><div className="projects-heading"><div><SceneTag n="03">SELECTED BUILDS</SceneTag><h2>Small systems.<br /><span className="serif-italic">Useful outcomes.</span></h2></div><p>Ideas moved from messy inputs to something a person can use.</p></div>
         <div className="project-list">{projects.slice(1).map((p) => <article className={`project-row accent-${p.accent}`} id={p.anchor} key={p.index} data-build-scene>
           <div className="project-visual" data-build-item><div className="project-visual-grid"/><div className={`project-graphic graphic-${p.index}`}><span/><span/><span/><span/><i/></div><span className="visual-code">{p.index === "02" ? "data → insight" : "DOM → dataset"}</span><span className="visual-serial">{p.index} / 03</span></div>
-          <div className="project-info"><SceneTag n={p.index}>{p.label}</SceneTag><div className="project-title-row"><h3 data-build-item>{p.title.split("\n").map((line) => <span key={line}>{line}</span>)}</h3><span className="project-status" data-build-item>{p.state}</span></div><p data-build-item>{p.description}</p><div className="tag-list" data-build-item>{p.stack.map(t => <span key={t}>{t}</span>)}</div><span className="project-open" aria-hidden="true"><Arrow diagonal /></span></div>
+          <div className="project-info"><SceneTag n={p.index}>{p.label}</SceneTag><div className="project-title-row"><h3 data-build-item>{p.title.split("\n").map((line) => <span key={line}>{line}</span>)}</h3><span className="project-status" data-build-item>{p.state}</span></div><p data-build-item>{p.description}</p><div className="tag-list" data-build-item>{p.stack.map(t => <span key={t}>{t}</span>)}</div><div data-build-item><ProjectDisclosure id={p.anchor}>{p.index === "02" ? <div className="details-grid grid grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2"><div><span>PIPELINE</span><p>Automated collection, cleaning, filtering, and structuring of localized listing data.</p></div><div><span>ANALYSIS</span><p>Pricing, location, and condition data are consolidated for market analysis and a localized assistant.</p></div></div> : <div className="details-grid grid grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2"><div><span>COLLECTION</span><p>DOM parsing to work with Canvas LMS content in a dynamically rendered interface.</p></div><div><span>OUTPUT</span><p>Assessment questions become structured, queryable data for an interactive dashboard.</p></div></div>}</ProjectDisclosure></div></div>
           <div className="edit-selection" aria-hidden="true"><i/><i/><i/><i/><b/><b/><b/><b/></div><div className="builder-cursor cursor-one" aria-hidden="true"><svg viewBox="0 0 24 28"><path d="M3 2.5 20.5 17l-8 .8-3.6 7.1L3 2.5Z"/></svg><span>agent.01</span></div><div className="builder-cursor cursor-two" aria-hidden="true"><svg viewBox="0 0 24 28"><path d="M3 2.5 20.5 17l-8 .8-3.6 7.1L3 2.5Z"/></svg><span>agent.02</span></div>
         </article>)}</div>
       </div>
