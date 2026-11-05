@@ -1,85 +1,56 @@
 <div align="center">
 
-<img src="public/repo-preview.svg" alt="Jae Hyun Tukushima portfolio cover" width="100%" />
+<img src="public/repo-preview.svg" alt="Jae Hyun Tukushima portfolio" width="100%" />
 
-# Jae Hyun Tukushima
+# Jae Hyun Tukushima · Portfolio
 
-### AI / Data Analyst · Computer Science @ FEU Tech
-
-**Making sense of what’s next.**
-
-I turn complex data into useful perspective — from spatial AI research to tools that help people learn, decide, and build.
+### A single-page experience composed as a sequence of moving scenes.
 
 <p>
-  <a href="https://www.linkedin.com/in/jae-hyun-tukushima/">LinkedIn</a> ·
-  <a href="https://github.com/jaexmachine">GitHub</a> ·
-  <a href="mailto:18jaehyun05@gmail.com">Say hello</a>
-</p>
-
-<p>
-  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-111719?style=flat-square&logo=nextdotjs&logoColor=white">
+  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-0B1428?style=flat-square&logo=nextdotjs&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white">
-  <img alt="GSAP ScrollTrigger" src="https://img.shields.io/badge/GSAP-ScrollTrigger-88CE02?style=flat-square&logo=greensock&logoColor=111719">
-  <img alt="Research in progress" src="https://img.shields.io/badge/GeoAI%20Research-In%20Progress-9AF0D4?style=flat-square">
+  <img alt="GSAP ScrollTrigger" src="https://img.shields.io/badge/GSAP-ScrollTrigger-83B6FF?style=flat-square&logo=greensock&logoColor=0B1428">
+  <img alt="Tailwind CSS 4" src="https://img.shields.io/badge/Tailwind_CSS-4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=0B1428">
 </p>
 
 </div>
 
 ---
 
-## Current focus · GeoAI research
+## Built as one continuous experience
 
-### Predictive Coastal Subsidence Heatmap Modeling
+The page is organized into full-screen scenes that lead into one another: an opening composition, featured work, background, journey, recognition, and a closing contact scene. A compact fixed navigation connects the major sections while the layout remains one uninterrupted scroll.
 
-**Lead researcher · October 2026 — present**
+## Scroll choreography
 
-Exploring a hybrid spatial-temporal AI pipeline to forecast multi-year land subsidence patterns across Metro Manila’s CAMANAVA corridor. The research brings together geospatial data, deep learning, explainable AI, and a decision-support dashboard.
+GSAP ScrollTrigger pins each scene while its sequence plays. The page holds its composition as a simulated editor measures real DOM bounds, moves its selection frame between elements, and reveals them in their final positions. Once a scene is complete, it stays assembled when the visitor scrolls back.
 
-`ConvLSTM` `Random Forest` `SHAP / XAI` `GeoPandas` `Rasterio` `FastAPI` `Mapbox GL JS`
+The scroll position drives the sequence, so visitors can ease through it at their own pace. Reduced-motion preferences skip the build effects and show the completed layout directly.
 
-> Research is in progress. The portfolio presents the work as it is being developed.
+## A small system of reusable parts
 
-## Selected work
-
-| Project | What it does |
+| Layer | Role |
 | --- | --- |
-| **Marketplace Intelligence Pipeline** | Turns localized marketplace listings into structured data for pricing and market analysis. |
-| **Canvas LMS Scraper** | Transforms assessment content into a structured, queryable dataset and interactive dashboard. |
+| **Scene** | Provides a consistent full-screen frame, selection overlay, agent cursors, and progress indicator. |
+| **Project rows** | Reuse a data-driven layout and measured selection animation for each featured build. |
+| **Project disclosures** | Expand details inline, with accessible state and a scroll-layout refresh. |
+| **Motion layer** | Coordinates pinned scroll sequences, real element bounds, persistent completed states, and reduced-motion behavior. |
+| **Visual layer** | Combines Tailwind CSS utilities with a custom navy design system, responsive layouts, and fine-grained interaction styling. |
 
-## Building with people
+## Interaction details
 
-At the **FEU Tech ACM Student Chapter**, I grew from Junior Officer to Associate Director for Academics, helping make technical learning more accessible and hands-on.
+- Section links move directly to Work, About, Journey, and Contact.
+- Project details expand beneath their cards instead of interrupting the scroll with a new page.
+- Buttons and cards use deliberate hover, focus, and press states.
+- Layouts adapt for smaller screens, and keyboard focus remains visible.
+- The build can be skipped for visitors who want to move straight through the page.
 
-<div align="center">
+## Stack
 
-| **200+** | **40+** | **40+ teams** |
-|:---:|:---:|:---:|
-| members reached through DataCamp Donates access | students in peer learning and Data Science workshops | supported at a university hackathon |
-
-</div>
-
-## Recognition
-
-- **Rank 1**, A.Y. 2024–2025 · FEU Institute of Technology
-- **President’s Scholarship**, Highest Honors · 100% tuition coverage
-- **DOST–SEI Scholar** · selected among 10,756 of 89,510 applicants
-
-**Certifications:** Microsoft Azure AI Essentials · GitHub Foundations · ITS Python · Salesforce AI Associate · Working with the OpenAI API · Data Literacy
-
-## Toolkit
-
-| Machine learning | Data & analysis | Cloud & engineering |
-| --- | --- | --- |
-| Python · PyTorch · Scikit-learn · MATLAB · Jupyter | Pandas · SQL · Matplotlib · Seaborn · Google Analytics · Google Sheets | Azure · Git · GitHub · GitHub Actions |
-
-## A portfolio with a pulse
-
-This site is designed to feel like a page being thoughtfully assembled in real time. Scroll to watch the headline settle into place, then follow the editor’s selection frame as each section is revealed. The finished content stays on screen; scroll back to replay the build in reverse.
+**Next.js 16** · **React 19** · **TypeScript** · **Tailwind CSS 4** · **GSAP ScrollTrigger** · **Custom CSS**
 
 <div align="center">
 
-**AI · DATA · SPATIAL SYSTEMS · INTELLIGENT AUTOMATION**
-
-*Curious by default. Building with purpose.*
+*Measured, assembled, and set in motion.*
 
 </div>
