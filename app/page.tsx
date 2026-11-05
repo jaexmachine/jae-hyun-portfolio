@@ -68,6 +68,21 @@ export default function Home() {
   const root = useRef<HTMLElement>(null);
   const [ready, setReady] = useState(false);
   const [toast, setToast] = useState("");
+  const [activeNav, setActiveNav] = useState("research");
+
+  useEffect(() => {
+    const sections = ["research", "about", "experience", "contact"]
+      .map((id) => document.getElementById(id))
+      .filter((section): section is HTMLElement => section !== null);
+    const observer = new IntersectionObserver((entries) => {
+      const current = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => Math.abs(a.boundingClientRect.top + a.boundingClientRect.height / 2 - window.innerHeight / 2) - Math.abs(b.boundingClientRect.top + b.boundingClientRect.height / 2 - window.innerHeight / 2))[0];
+      if (current) setActiveNav(current.target.id);
+    }, { rootMargin: "-42% 0px -48% 0px", threshold: 0 });
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
 
   useLayoutEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -221,7 +236,7 @@ export default function Home() {
     <div className="ambient-orb orb-a" /><div className="ambient-orb orb-b" />
     <header className="topbar">
       <a className="brand" href="#home" aria-label="Jae Hyun home"><span className="brand-mark">j<span>.</span></span><span className="brand-name">jae hyun<br /><small>PORTFOLIO / 2026</small></span></a>
-      <nav className="flex items-center gap-2 sm:gap-3 md:gap-8" aria-label="Main navigation"><a href="#research">Work</a><a href="#about">About</a><a href="#experience">Journey</a><a href="#contact">Contact</a></nav>
+      <nav className="flex items-center gap-2 sm:gap-3 md:gap-8" aria-label="Main navigation"><a className={activeNav === "research" ? "is-active" : ""} aria-current={activeNav === "research" ? "location" : undefined} href="#research" onClick={() => setActiveNav("research")}>Work</a><a className={activeNav === "about" ? "is-active" : ""} aria-current={activeNav === "about" ? "location" : undefined} href="#about" onClick={() => setActiveNav("about")}>About</a><a className={activeNav === "experience" ? "is-active" : ""} aria-current={activeNav === "experience" ? "location" : undefined} href="#experience" onClick={() => setActiveNav("experience")}>Journey</a><a className={activeNav === "contact" ? "is-active" : ""} aria-current={activeNav === "contact" ? "location" : undefined} href="#contact" onClick={() => setActiveNav("contact")}>Contact</a></nav>
       <div className="top-actions"><span className="availability"><i /> OPEN TO OPPORTUNITIES</span><a className="contact-pill" href="#contact">Let’s talk <Arrow diagonal /></a></div>
     </header>
 
