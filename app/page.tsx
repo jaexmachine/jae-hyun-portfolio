@@ -156,6 +156,11 @@ function CustomCursor() {
       if (!frame) frame = requestAnimationFrame(tick);
     };
 
+    const easeCorrection = (value: number) => {
+      const t = Math.max(0, Math.min(1, value));
+      return t * t * t * (t * (t * 6 - 15) + 10);
+    };
+
     const tick = () => {
       if (!active) { frame = 0; return; }
       const now = performance.now();
@@ -181,13 +186,26 @@ function CustomCursor() {
       const upright = 0;
       const adjusting = !reducedMotion && adjustmentStartedAt > 0 && settleTime < 1100;
       const correctionPhase = !adjusting ? "none" : settleTime < 360 ? "right" : settleTime < 720 ? "left" : "settle";
+      const correctionProgress = Math.min(settleTime / 1100, 1);
+      const rightEnd = 360 / 1100;
+      const leftEnd = 720 / 1100;
+      const correctionAngle = !adjusting ? 0 : correctionProgress < rightEnd
+        ? 0.31 * easeCorrection(correctionProgress / rightEnd)
+        : correctionProgress < leftEnd
+          ? 0.31 - 0.49 * easeCorrection((correctionProgress - rightEnd) / (leftEnd - rightEnd))
+          : -0.18 + 0.18 * easeCorrection((correctionProgress - leftEnd) / (1 - leftEnd));
+      const correctionOffset = !adjusting ? 0 : correctionProgress < rightEnd
+        ? 8 * easeCorrection(correctionProgress / rightEnd)
+        : correctionProgress < leftEnd
+          ? 8 - 11 * easeCorrection((correctionProgress - rightEnd) / (leftEnd - rightEnd))
+          : -3 + 3 * easeCorrection((correctionProgress - leftEnd) / (1 - leftEnd));
       const visualCorrectionPhase = horizontalDirection < 0
         ? correctionPhase === "right" ? "left" : correctionPhase === "left" ? "right" : correctionPhase
         : correctionPhase;
       const targetAngle = !pointerPresent
-        ? correctionPhase === "right" ? upright + 0.31 * horizontalDirection : correctionPhase === "left" ? upright - 0.18 * horizontalDirection : upright
-        : underCursor ? upright : Math.atan2(position.y - rocketPosition.y, position.x - rocketPosition.x) + Math.PI / 2;
-      const horizontalCorrection = reducedMotion ? 0 : correctionPhase === "right" ? 8 * horizontalDirection : correctionPhase === "left" ? -3 * horizontalDirection : 0;
+        ? upright + correctionAngle * horizontalDirection
+        : pointerMoving || !underCursor ? Math.atan2(position.y - rocketPosition.y, position.x - rocketPosition.x) + Math.PI / 2 : upright;
+      const horizontalCorrection = reducedMotion ? 0 : correctionOffset * horizontalDirection;
       const targetX = !pointerPresent || followDelayActive ? rocketPosition.x : position.x + horizontalCorrection;
       const targetY = !pointerPresent || followDelayActive ? rocketPosition.y : position.y + 21;
       const distanceX = targetX - rocketPosition.x;
