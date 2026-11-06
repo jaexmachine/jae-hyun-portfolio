@@ -159,8 +159,8 @@ function CustomCursor() {
         rocketPosition.velocityY = 0;
       } else {
         const ignitionDelay = pointerMoving && !engineActive ? 0.42 : engineActive ? 1 : 0.82;
-        rocketPosition.velocityX = (rocketPosition.velocityX + distanceX * 0.045 * ignitionDelay) * 0.82;
-        rocketPosition.velocityY = (rocketPosition.velocityY + distanceY * 0.045 * ignitionDelay) * 0.82;
+        rocketPosition.velocityX = (rocketPosition.velocityX + distanceX * 0.022 * ignitionDelay) * 0.84;
+        rocketPosition.velocityY = (rocketPosition.velocityY + distanceY * 0.022 * ignitionDelay) * 0.84;
         rocketPosition.x += rocketPosition.velocityX;
         rocketPosition.y += rocketPosition.velocityY;
       }
