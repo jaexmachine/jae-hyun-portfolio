@@ -137,22 +137,26 @@ function CustomCursor() {
       const engineActive = pointerMoving && movementStartedAt > 0 && now - movementStartedAt >= 125;
       if (pointerMoving && pointerSpeed > 0.4) wasMoving = true;
       else if (wasMoving) { wasMoving = false; idleSince = now; pointerSpeed = 0; movementStartedAt = 0; }
+      const followDelayActive = !reducedMotion && pointerMoving && movementStartedAt > 0 && now - movementStartedAt < 110;
       const settleTime = idleSince ? now - idleSince : 1000;
       const upright = 0;
       const adjusting = !reducedMotion && idleSince > 0 && settleTime < 820;
       const correctionPhase = !adjusting ? "none" : settleTime < 280 ? "right" : settleTime < 540 ? "left" : "settle";
-      const targetAngle = pointerMoving && pointerSpeed > 0.4
+      const targetAngle = pointerMoving && pointerSpeed > 0.4 && !followDelayActive
         ? pointerAngle + Math.PI / 2
         : reducedMotion ? upright : correctionPhase === "right" ? upright + 0.2 : correctionPhase === "left" ? upright - 0.09 : upright;
       const horizontalCorrection = reducedMotion ? 0 : correctionPhase === "right" ? 8 : correctionPhase === "left" ? -3 : 0;
-      const targetX = position.x + horizontalCorrection;
-      const targetY = position.y + 21;
+      const targetX = followDelayActive ? rocketPosition.x : position.x + horizontalCorrection;
+      const targetY = followDelayActive ? rocketPosition.y : position.y + 21;
       const distanceX = targetX - rocketPosition.x;
       const distanceY = targetY - rocketPosition.y;
       const distance = Math.hypot(distanceX, distanceY);
       if (reducedMotion) {
         rocketPosition.x += distanceX * 0.46;
         rocketPosition.y += distanceY * 0.46;
+      } else if (followDelayActive) {
+        rocketPosition.velocityX = 0;
+        rocketPosition.velocityY = 0;
       } else {
         const ignitionDelay = pointerMoving && !engineActive ? 0.42 : engineActive ? 1 : 0.82;
         rocketPosition.velocityX = (rocketPosition.velocityX + distanceX * 0.09 * ignitionDelay) * 0.75;
