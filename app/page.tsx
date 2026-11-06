@@ -87,7 +87,6 @@ function CustomCursor() {
       puff.style.width = `${10 + index * 2}px`;
       puff.style.height = `${7 + index * 1.4}px`;
     });
-    let pointerAngle = 0;
     let pointerSpeed = 0;
     let lastMoveAt = 0;
     let movementStartedAt = 0;
@@ -148,13 +147,14 @@ function CustomCursor() {
         hasAdjustedOnCatchup = true;
         adjustmentStartedAt = now;
       }
+      const underCursor = cursorGap < 26;
       const settleTime = adjustmentStartedAt ? now - adjustmentStartedAt : 1000;
       const upright = 0;
       const adjusting = !reducedMotion && adjustmentStartedAt > 0 && settleTime < 820;
       const correctionPhase = !adjusting ? "none" : settleTime < 280 ? "right" : settleTime < 540 ? "left" : "settle";
-      const targetAngle = pointerMoving && pointerSpeed > 0.4 && !followDelayActive
-        ? pointerAngle + Math.PI / 2
-        : reducedMotion ? upright : correctionPhase === "right" ? upright + 0.2 : correctionPhase === "left" ? upright - 0.09 : upright;
+      const targetAngle = underCursor
+        ? upright
+        : Math.atan2(position.y - rocketPosition.y, position.x - rocketPosition.x) + Math.PI / 2;
       const horizontalCorrection = reducedMotion ? 0 : correctionPhase === "right" ? 8 : correctionPhase === "left" ? -3 : 0;
       const targetX = followDelayActive ? rocketPosition.x : position.x + horizontalCorrection;
       const targetY = followDelayActive ? rocketPosition.y : position.y + 21;
@@ -167,7 +167,7 @@ function CustomCursor() {
       } else if (followDelayActive) {
         // Hold position briefly before starting the constant-speed follow.
       } else {
-        const followStep = Math.min(distance, 165 * delta);
+        const followStep = Math.min(distance, 185 * delta);
         if (distance > 0) {
           rocketPosition.x += distanceX / distance * followStep;
           rocketPosition.y += distanceY / distance * followStep;
@@ -265,7 +265,6 @@ function CustomCursor() {
         if (movement > 0.2) {
           const now = performance.now();
           if (!wasMoving || now - lastMoveAt > 200) movementStartedAt = now;
-          pointerAngle = Math.atan2(movementY, movementX);
           pointerSpeed = movement;
           wasMoving = true;
         }
