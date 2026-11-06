@@ -79,13 +79,15 @@ function CustomCursor() {
     const trail = trailRefs.current.filter((dot): dot is HTMLSpanElement => dot !== null);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const position = { x: -100, y: -100 };
-    const rocketPosition = { x: -140, y: -100, angle: 0 };
+    const rocketPosition = { x: -140, y: -100, angle: -Math.PI / 2, velocityX: 0, velocityY: 0, angleVelocity: 0 };
     const trailPositions = trail.map(() => ({ x: -100, y: -100 }));
     const cursor = star.closest<HTMLElement>(".custom-cursor");
     if (!cursor) return;
     let pointerAngle = 0;
     let pointerSpeed = 0;
     let lastMoveAt = 0;
+    let wasMoving = false;
+    let idleSince = 0;
     let initialized = false;
     let active = false;
     let frame = 0;
@@ -105,21 +107,37 @@ function CustomCursor() {
       if (!active) { frame = 0; return; }
       const now = performance.now();
       const pointerMoving = now - lastMoveAt < 120;
-      const moveAngle = pointerMoving && pointerSpeed > 0.4 ? pointerAngle : Math.atan2(position.y - rocketPosition.y, position.x - rocketPosition.x);
-      const headingX = Math.cos(moveAngle);
-      const headingY = Math.sin(moveAngle);
-      const targetX = position.x - headingX * 14;
-      const targetY = position.y - headingY * 14;
+      if (pointerMoving && pointerSpeed > 0.4) wasMoving = true;
+      else if (wasMoving) { wasMoving = false; idleSince = now; }
+      const settleTime = idleSince ? now - idleSince : 1000;
+      const upright = -Math.PI / 2;
+      const adjusting = !reducedMotion && idleSince > 0 && settleTime < 340;
+      const targetAngle = pointerMoving && pointerSpeed > 0.4
+        ? pointerAngle
+        : reducedMotion ? upright : settleTime < 140 ? upright + 0.16 : settleTime < 280 ? upright - 0.075 : upright;
+      const horizontalCorrection = reducedMotion ? 0 : settleTime < 140 ? 7 : settleTime < 280 ? -2.5 : 0;
+      const targetX = position.x + horizontalCorrection;
+      const targetY = position.y + 21;
       const distanceX = targetX - rocketPosition.x;
       const distanceY = targetY - rocketPosition.y;
       const distance = Math.hypot(distanceX, distanceY);
-      const catchUp = reducedMotion ? 0.38 : Math.min(0.28, 0.09 + distance * 0.0016);
-      rocketPosition.x += distanceX * catchUp;
-      rocketPosition.y += distanceY * catchUp;
+      if (reducedMotion) {
+        rocketPosition.x += distanceX * 0.46;
+        rocketPosition.y += distanceY * 0.46;
+      } else {
+        rocketPosition.velocityX = (rocketPosition.velocityX + distanceX * 0.12) * 0.72;
+        rocketPosition.velocityY = (rocketPosition.velocityY + distanceY * 0.12) * 0.72;
+        rocketPosition.x += rocketPosition.velocityX;
+        rocketPosition.y += rocketPosition.velocityY;
+      }
 
-      const aim = Math.atan2(position.y - rocketPosition.y, position.x - rocketPosition.x);
-      const angleDifference = Math.atan2(Math.sin(aim - rocketPosition.angle), Math.cos(aim - rocketPosition.angle));
-      rocketPosition.angle += angleDifference * (reducedMotion ? 0.42 : 0.2);
+      const angleDifference = Math.atan2(Math.sin(targetAngle - rocketPosition.angle), Math.cos(targetAngle - rocketPosition.angle));
+      if (reducedMotion) rocketPosition.angle += angleDifference * 0.42;
+      else {
+        rocketPosition.angleVelocity = (rocketPosition.angleVelocity + angleDifference * 0.1) * 0.74;
+        rocketPosition.angle += rocketPosition.angleVelocity;
+      }
+      cursor.setAttribute("data-adjusting", adjusting ? "true" : "false");
       rocket.style.transform = `translate3d(${rocketPosition.x - 12}px, ${rocketPosition.y - 12}px, 0) rotate(${rocketPosition.angle}rad)`;
 
       let trailStillMoving = false;
@@ -137,8 +155,8 @@ function CustomCursor() {
         followY = point.y;
       });
 
-      const rocketStillMoving = distance > 0.7 || Math.abs(angleDifference) > 0.02;
-      if (pointerMoving || trailStillMoving || rocketStillMoving) frame = requestAnimationFrame(tick);
+      const rocketStillMoving = distance > 0.7 || Math.abs(angleDifference) > 0.02 || Math.abs(rocketPosition.angleVelocity) > 0.005;
+      if (pointerMoving || trailStillMoving || rocketStillMoving || adjusting) frame = requestAnimationFrame(tick);
       else frame = 0;
     };
 
@@ -174,6 +192,7 @@ function CustomCursor() {
       active = true;
       cursor.setAttribute("data-visible", "true");
       cursor.setAttribute("data-hover", element?.closest("a, button, [role='button']") ? "true" : "false");
+      cursor.setAttribute("data-adjusting", "false");
       star.style.transform = `translate3d(${position.x - 3}px, ${position.y - 3}px, 0)`;
 
       if (!frame) frame = requestAnimationFrame(tick);
@@ -185,6 +204,7 @@ function CustomCursor() {
       cursor.setAttribute("data-pressed", "true");
     };
     const onPointerUp = (event: PointerEvent) => {
+      window.clearTimeout(hideTimer);
       cursor.setAttribute("data-pressed", "false");
       if (event.pointerType === "touch") hideTimer = window.setTimeout(hideCursor, 500);
     };
