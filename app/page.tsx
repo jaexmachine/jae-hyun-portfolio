@@ -146,6 +146,7 @@ function CustomCursor() {
       pointerSpeed = 0;
       movementStartedAt = 0;
       lastMoveAt = 0;
+      rocketPosition.angleVelocity = 0;
       adjustmentStartedAt = performance.now();
       hasAdjustedOnCatchup = true;
       cursor.setAttribute("data-adjusting", reducedMotion ? "false" : "true");
@@ -177,10 +178,10 @@ function CustomCursor() {
       const underCursor = cursorGap < 26;
       const settleTime = adjustmentStartedAt ? now - adjustmentStartedAt : 1000;
       const upright = 0;
-      const adjusting = !reducedMotion && adjustmentStartedAt > 0 && settleTime < 820;
-      const correctionPhase = !adjusting ? "none" : settleTime < 280 ? "right" : settleTime < 540 ? "left" : "settle";
+      const adjusting = !reducedMotion && adjustmentStartedAt > 0 && settleTime < 1100;
+      const correctionPhase = !adjusting ? "none" : settleTime < 360 ? "right" : settleTime < 720 ? "left" : "settle";
       const targetAngle = !pointerPresent
-        ? correctionPhase === "right" ? upright + 0.2 : correctionPhase === "left" ? upright - 0.09 : upright
+        ? correctionPhase === "right" ? upright + 0.31 : correctionPhase === "left" ? upright - 0.18 : upright
         : underCursor ? upright : Math.atan2(position.y - rocketPosition.y, position.x - rocketPosition.x) + Math.PI / 2;
       const horizontalCorrection = reducedMotion ? 0 : correctionPhase === "right" ? 8 : correctionPhase === "left" ? -3 : 0;
       const targetX = !pointerPresent || followDelayActive ? rocketPosition.x : position.x + horizontalCorrection;
@@ -324,7 +325,8 @@ function CustomCursor() {
       cursor.setAttribute("data-pressed", "false");
       if (event.pointerType === "touch") hideTimer = window.setTimeout(hideCursor, 900);
     };
-    const onPointerLeave = () => pauseCursor();
+    const onPointerLeave = () => { if (pointerPresent) pauseCursor(); };
+    const onWindowMouseOut = (event: MouseEvent) => { if (!event.relatedTarget) onPointerLeave(); };
 
     document.addEventListener("pointermove", onPointerMove, { passive: true });
     document.addEventListener("pointerdown", onPointerDown, { passive: true });
@@ -332,6 +334,7 @@ function CustomCursor() {
     window.addEventListener("pointercancel", onPointerUp, { passive: true });
     document.documentElement.addEventListener("pointerleave", onPointerLeave);
     window.addEventListener("blur", onPointerLeave);
+    window.addEventListener("mouseout", onWindowMouseOut);
 
     return () => {
       window.clearTimeout(hideTimer);
@@ -343,6 +346,7 @@ function CustomCursor() {
       window.removeEventListener("pointercancel", onPointerUp);
       document.documentElement.removeEventListener("pointerleave", onPointerLeave);
       window.removeEventListener("blur", onPointerLeave);
+      window.removeEventListener("mouseout", onWindowMouseOut);
     };
   }, []);
 
