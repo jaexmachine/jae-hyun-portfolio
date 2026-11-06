@@ -92,7 +92,8 @@ function CustomCursor() {
     let lastMoveAt = 0;
     let movementStartedAt = 0;
     let wasMoving = false;
-    let idleSince = 0;
+    let adjustmentStartedAt = 0;
+    let hasAdjustedOnCatchup = false;
     let initialized = false;
     let active = false;
     let frame = 0;
@@ -115,7 +116,8 @@ function CustomCursor() {
       wasMoving = false;
       pointerSpeed = 0;
       movementStartedAt = 0;
-      idleSince = 0;
+      adjustmentStartedAt = 0;
+      hasAdjustedOnCatchup = false;
       cloudParticles.forEach((particle, index) => {
         particle.active = false;
         particle.opacity = 0;
@@ -136,11 +138,19 @@ function CustomCursor() {
       const pointerMoving = now - lastMoveAt < 200;
       const engineActive = pointerMoving && movementStartedAt > 0 && now - movementStartedAt >= 175;
       if (pointerMoving && pointerSpeed > 0.4) wasMoving = true;
-      else if (wasMoving) { wasMoving = false; idleSince = now; pointerSpeed = 0; movementStartedAt = 0; }
+      else if (wasMoving) { wasMoving = false; pointerSpeed = 0; movementStartedAt = 0; }
       const followDelayActive = !reducedMotion && pointerMoving && movementStartedAt > 0 && now - movementStartedAt < 165;
-      const settleTime = idleSince ? now - idleSince : 1000;
+      const cursorGap = Math.hypot(position.x - rocketPosition.x, position.y + 21 - rocketPosition.y);
+      if (cursorGap > 48) {
+        hasAdjustedOnCatchup = false;
+        adjustmentStartedAt = 0;
+      } else if (!reducedMotion && !hasAdjustedOnCatchup && cursorGap < 26) {
+        hasAdjustedOnCatchup = true;
+        adjustmentStartedAt = now;
+      }
+      const settleTime = adjustmentStartedAt ? now - adjustmentStartedAt : 1000;
       const upright = 0;
-      const adjusting = !reducedMotion && idleSince > 0 && settleTime < 820;
+      const adjusting = !reducedMotion && adjustmentStartedAt > 0 && settleTime < 820;
       const correctionPhase = !adjusting ? "none" : settleTime < 280 ? "right" : settleTime < 540 ? "left" : "settle";
       const targetAngle = pointerMoving && pointerSpeed > 0.4 && !followDelayActive
         ? pointerAngle + Math.PI / 2
@@ -157,7 +167,7 @@ function CustomCursor() {
       } else if (followDelayActive) {
         // Hold position briefly before starting the constant-speed follow.
       } else {
-        const followStep = Math.min(distance, 145 * delta);
+        const followStep = Math.min(distance, 165 * delta);
         if (distance > 0) {
           rocketPosition.x += distanceX / distance * followStep;
           rocketPosition.y += distanceY / distance * followStep;
