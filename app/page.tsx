@@ -68,7 +68,7 @@ function ProjectDisclosure({ id, children }: { id: string; children: React.React
 function CustomCursor() {
   const starRef = useRef<HTMLSpanElement>(null);
   const rocketRef = useRef<HTMLSpanElement>(null);
-  const trailRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const cloudRefs = useRef<Array<HTMLSpanElement | null>>([]);
 
   useEffect(() => {
     const star = starRef.current;
@@ -76,16 +76,21 @@ function CustomCursor() {
     if (!star || !rocket) return;
 
     const root = document.documentElement;
-    const trail = trailRefs.current.filter((dot): dot is HTMLSpanElement => dot !== null);
+    const clouds = cloudRefs.current.filter((puff): puff is HTMLSpanElement => puff !== null);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const position = { x: -100, y: -100 };
     const rocketPosition = { x: -140, y: -100, angle: 0, velocityX: 0, velocityY: 0, angleVelocity: 0 };
-    const trailPositions = trail.map(() => ({ x: -100, y: -100 }));
+    const cloudPositions = clouds.map(() => ({ x: -100, y: -100, opacity: 0 }));
     const cursor = star.closest<HTMLElement>(".custom-cursor");
     if (!cursor) return;
+    clouds.forEach((puff, index) => {
+      puff.style.width = `${10 + index * 2}px`;
+      puff.style.height = `${7 + index * 1.4}px`;
+    });
     let pointerAngle = 0;
     let pointerSpeed = 0;
     let lastMoveAt = 0;
+    let movementStartedAt = 0;
     let wasMoving = false;
     let idleSince = 0;
     let initialized = false;
@@ -98,7 +103,14 @@ function CustomCursor() {
       cursor.setAttribute("data-visible", "false");
       cursor.setAttribute("data-hover", "false");
       cursor.setAttribute("data-pressed", "false");
+      cursor.setAttribute("data-engine-active", "false");
+      cursor.setAttribute("data-adjusting", "false");
       root.classList.remove("has-custom-cursor");
+      initialized = false;
+      wasMoving = false;
+      pointerSpeed = 0;
+      movementStartedAt = 0;
+      idleSince = 0;
       if (frame) cancelAnimationFrame(frame);
       frame = 0;
     };
@@ -107,8 +119,9 @@ function CustomCursor() {
       if (!active) { frame = 0; return; }
       const now = performance.now();
       const pointerMoving = now - lastMoveAt < 120;
+      const engineActive = pointerMoving && movementStartedAt > 0 && now - movementStartedAt >= 125;
       if (pointerMoving && pointerSpeed > 0.4) wasMoving = true;
-      else if (wasMoving) { wasMoving = false; idleSince = now; }
+      else if (wasMoving) { wasMoving = false; idleSince = now; pointerSpeed = 0; movementStartedAt = 0; }
       const settleTime = idleSince ? now - idleSince : 1000;
       const upright = 0;
       const adjusting = !reducedMotion && idleSince > 0 && settleTime < 500;
@@ -125,8 +138,9 @@ function CustomCursor() {
         rocketPosition.x += distanceX * 0.46;
         rocketPosition.y += distanceY * 0.46;
       } else {
-        rocketPosition.velocityX = (rocketPosition.velocityX + distanceX * 0.09) * 0.75;
-        rocketPosition.velocityY = (rocketPosition.velocityY + distanceY * 0.09) * 0.75;
+        const ignitionDelay = pointerMoving && !engineActive ? 0.42 : engineActive ? 1 : 0.82;
+        rocketPosition.velocityX = (rocketPosition.velocityX + distanceX * 0.09 * ignitionDelay) * 0.75;
+        rocketPosition.velocityY = (rocketPosition.velocityY + distanceY * 0.09 * ignitionDelay) * 0.75;
         rocketPosition.x += rocketPosition.velocityX;
         rocketPosition.y += rocketPosition.velocityY;
       }
@@ -138,25 +152,36 @@ function CustomCursor() {
         rocketPosition.angle += rocketPosition.angleVelocity;
       }
       cursor.setAttribute("data-adjusting", adjusting ? "true" : "false");
+      cursor.setAttribute("data-engine-active", engineActive ? "true" : "false");
       rocket.style.transform = `translate3d(${rocketPosition.x - 12}px, ${rocketPosition.y - 12}px, 0) rotate(${rocketPosition.angle}rad)`;
 
-      let trailStillMoving = false;
-      let followX = position.x;
-      let followY = position.y;
-      trailPositions.forEach((point, index) => {
-        const dx = followX - point.x;
-        const dy = followY - point.y;
-        point.x += dx * (reducedMotion ? 0.42 : 0.24);
-        point.y += dy * (reducedMotion ? 0.42 : 0.24);
-        if (Math.hypot(dx, dy) > 0.7) trailStillMoving = true;
-        trail[index].style.transform = `translate3d(${point.x - 2}px, ${point.y - 2}px, 0)`;
-        trail[index].style.opacity = pointerMoving ? `${Math.max(0.08, 0.4 - index * 0.075)}` : "0";
+      const tailX = -Math.sin(rocketPosition.angle);
+      const tailY = Math.cos(rocketPosition.angle);
+      const engineX = rocketPosition.x + tailX * 14;
+      const engineY = rocketPosition.y + tailY * 14;
+      const cloudTargetOpacity = engineActive ? 0.72 : adjusting ? 0.3 : 0;
+      let cloudStillMoving = false;
+      let followX = engineX;
+      let followY = engineY;
+      cloudPositions.forEach((point, index) => {
+        const targetCloudX = followX + tailX * (index === 0 ? 2 : 5);
+        const targetCloudY = followY + tailY * (index === 0 ? 2 : 5);
+        const dx = targetCloudX - point.x;
+        const dy = targetCloudY - point.y;
+        const cloudEase = reducedMotion ? 0.35 : engineActive ? 0.14 : 0.1;
+        point.x += dx * cloudEase;
+        point.y += dy * cloudEase;
+        point.opacity += (cloudTargetOpacity * (1 - index * 0.11) - point.opacity) * (reducedMotion ? 0.35 : 0.12);
+        if (Math.hypot(dx, dy) > 0.65 || point.opacity > 0.015) cloudStillMoving = true;
+        clouds[index].style.transform = `translate3d(${point.x - (5 + index)}px, ${point.y - (3.5 + index * 0.7)}px, 0)`;
+        clouds[index].style.opacity = `${point.opacity}`;
         followX = point.x;
         followY = point.y;
       });
 
       const rocketStillMoving = distance > 0.7 || Math.abs(angleDifference) > 0.02 || Math.abs(rocketPosition.angleVelocity) > 0.005;
-      if (pointerMoving || trailStillMoving || rocketStillMoving || adjusting) frame = requestAnimationFrame(tick);
+      const waitingForIgnition = pointerMoving && !engineActive;
+      if (pointerMoving || cloudStillMoving || rocketStillMoving || adjusting || waitingForIgnition) frame = requestAnimationFrame(tick);
       else frame = 0;
     };
 
@@ -174,15 +199,22 @@ function CustomCursor() {
       if (!initialized) {
         rocketPosition.x = event.clientX - 42;
         rocketPosition.y = event.clientY + 24;
-        trailPositions.forEach((point) => { point.x = event.clientX; point.y = event.clientY; });
+        rocketPosition.velocityX = 0;
+        rocketPosition.velocityY = 0;
+        rocketPosition.angle = 0;
+        rocketPosition.angleVelocity = 0;
+        cloudPositions.forEach((point) => { point.x = event.clientX - 42; point.y = event.clientY + 38; point.opacity = 0; });
         initialized = true;
       } else {
         const movementX = event.clientX - position.x;
         const movementY = event.clientY - position.y;
         const movement = Math.hypot(movementX, movementY);
         if (movement > 0.2) {
+          const now = performance.now();
+          if (!wasMoving || now - lastMoveAt > 120) movementStartedAt = now;
           pointerAngle = Math.atan2(movementY, movementX);
           pointerSpeed = movement;
+          wasMoving = true;
         }
       }
 
@@ -230,8 +262,8 @@ function CustomCursor() {
     };
   }, []);
 
-  return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-hover="false" data-pressed="false">
-    {[0, 1, 2, 3].map((index) => <span className="cursor-trail-dot" key={index} ref={(node) => { trailRefs.current[index] = node; }} />)}
+  return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-hover="false" data-pressed="false" data-adjusting="false" data-engine-active="false">
+    {[0, 1, 2, 3, 4].map((index) => <span className="rocket-cloud-puff" key={index} ref={(node) => { cloudRefs.current[index] = node; }} />)}
     <span className="cursor-star" ref={starRef}><svg viewBox="0 0 12 12"><path d="M6 0.5 7.35 4.65 11.5 6 7.35 7.35 6 11.5 4.65 7.35.5 6 4.65 4.65 6 .5Z" /></svg></span>
     <span className="cursor-rocket" ref={rocketRef}><svg viewBox="0 0 28 28"><path className="rocket-fin" d="M9 13.5 4.5 20.5 9 19.3ZM19 13.5l4.5 7-4.5-1.2Z"/><path className="rocket-correction-jet" d="M8.8 15.5 6.3 18.5l2.6-.8Zm10.4 0 2.5 3-2.6-.8Z"/><path className="rocket-body" d="M14 2C10 5.6 8.5 10.5 8.5 17v2h11v-2C19.5 10.5 18 5.6 14 2Z"/><circle className="rocket-window" cx="14" cy="10.5" r="2.1"/><path className="rocket-flame" d="M11 19 14 26 17 19Z"/></svg></span>
   </div>;
