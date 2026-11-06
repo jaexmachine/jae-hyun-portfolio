@@ -80,7 +80,7 @@ function CustomCursor() {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const position = { x: -100, y: -100 };
     const rocketPosition = { x: -140, y: -100, angle: 0, velocityX: 0, velocityY: 0, angleVelocity: 0 };
-    const cloudPositions = clouds.map(() => ({ x: -100, y: -100, opacity: 0 }));
+    const cloudParticles = clouds.map(() => ({ x: 0, y: 0, vx: 0, vy: 0, age: 0, life: 0, size: 0, opacity: 0, active: false }));
     const cursor = star.closest<HTMLElement>(".custom-cursor");
     if (!cursor) return;
     clouds.forEach((puff, index) => {
@@ -97,6 +97,10 @@ function CustomCursor() {
     let active = false;
     let frame = 0;
     let hideTimer = 0;
+    let nextCloud = 0;
+    let cloudEmissionAt = 0;
+    let emittedCloudCount = 0;
+    let previousFrameAt = 0;
 
     const hideCursor = () => {
       active = false;
@@ -112,6 +116,14 @@ function CustomCursor() {
       pointerSpeed = 0;
       movementStartedAt = 0;
       idleSince = 0;
+      cloudParticles.forEach((particle, index) => {
+        particle.active = false;
+        particle.opacity = 0;
+        clouds[index].style.opacity = "0";
+      });
+      nextCloud = 0;
+      cloudEmissionAt = 0;
+      previousFrameAt = 0;
       if (frame) cancelAnimationFrame(frame);
       frame = 0;
     };
@@ -119,6 +131,8 @@ function CustomCursor() {
     const tick = () => {
       if (!active) { frame = 0; return; }
       const now = performance.now();
+      const delta = previousFrameAt ? Math.min((now - previousFrameAt) / 1000, 0.06) : 1 / 60;
+      previousFrameAt = now;
       const pointerMoving = now - lastMoveAt < 120;
       const engineActive = pointerMoving && movementStartedAt > 0 && now - movementStartedAt >= 125;
       if (pointerMoving && pointerSpeed > 0.4) wasMoving = true;
@@ -162,29 +176,55 @@ function CustomCursor() {
       const tailY = Math.cos(rocketPosition.angle);
       const engineX = rocketPosition.x + tailX * 14;
       const engineY = rocketPosition.y + tailY * 14;
-      const cloudTargetOpacity = engineActive ? 0.74 : correctionPhase === "right" ? 0.82 : correctionPhase === "left" ? 0.7 : correctionPhase === "settle" ? 0.42 : 0;
-      let cloudStillMoving = false;
-      let followX = engineX;
-      let followY = engineY;
-      cloudPositions.forEach((point, index) => {
-        const targetCloudX = followX + tailX * (index === 0 ? 2 : 5);
-        const targetCloudY = followY + tailY * (index === 0 ? 2 : 5);
-        const dx = targetCloudX - point.x;
-        const dy = targetCloudY - point.y;
-        const cloudEase = reducedMotion ? 0.35 : engineActive ? 0.14 : 0.1;
-        point.x += dx * cloudEase;
-        point.y += dy * cloudEase;
-        point.opacity += (cloudTargetOpacity * (1 - index * 0.11) - point.opacity) * (reducedMotion ? 0.35 : 0.12);
-        if (Math.hypot(dx, dy) > 0.65 || point.opacity > 0.015) cloudStillMoving = true;
-        clouds[index].style.transform = `translate3d(${point.x - (5 + index)}px, ${point.y - (3.5 + index * 0.7)}px, 0)`;
-        clouds[index].style.opacity = `${point.opacity}`;
-        followX = point.x;
-        followY = point.y;
+      const correctionSide = correctionPhase === "right" ? 1 : correctionPhase === "left" ? -1 : 0;
+      const emissionPeriod = engineActive ? 68 : adjusting && correctionSide !== 0 ? 82 : 0;
+      if (!reducedMotion && emissionPeriod && now - cloudEmissionAt >= emissionPeriod) {
+        const index = nextCloud;
+        const particle = cloudParticles[index];
+        const jitter = ((emittedCloudCount % 3) - 1) * 1.4;
+        const sideX = Math.cos(rocketPosition.angle);
+        const sideY = Math.sin(rocketPosition.angle);
+        particle.x = engineX + sideX * correctionSide * 7;
+        particle.y = engineY + sideY * correctionSide * 7;
+        particle.vx = tailX * 0.55 + sideX * correctionSide * 0.35 + jitter * 0.12;
+        particle.vy = tailY * 0.55 + sideY * correctionSide * 0.35 + jitter * 0.08;
+        particle.age = 0;
+        particle.life = correctionSide ? 0.72 : 0.82;
+        particle.size = 9 + (emittedCloudCount % 4) * 2;
+        particle.opacity = correctionSide ? 0.72 : 0.62;
+        particle.active = true;
+        clouds[index].style.width = `${particle.size}px`;
+        clouds[index].style.height = `${particle.size * 0.72}px`;
+        nextCloud = (nextCloud + 1) % clouds.length;
+        emittedCloudCount += 1;
+        cloudEmissionAt = now;
+      }
+
+      let cloudsAnimating = false;
+      cloudParticles.forEach((particle, index) => {
+        if (!particle.active) return;
+        particle.age += delta;
+        const age = particle.age / particle.life;
+        if (age >= 1) {
+          particle.active = false;
+          clouds[index].style.opacity = "0";
+          return;
+        }
+        const drift = delta * 60;
+        particle.x += particle.vx * drift;
+        particle.y += particle.vy * drift;
+        particle.vx *= Math.pow(0.96, drift);
+        particle.vy *= Math.pow(0.96, drift);
+        const opacity = particle.opacity * Math.pow(1 - age, 1.35);
+        const scale = 0.7 + age * 1.15;
+        clouds[index].style.transform = `translate3d(${particle.x - particle.size / 2}px, ${particle.y - particle.size * 0.36}px, 0) scale(${scale})`;
+        clouds[index].style.opacity = `${opacity}`;
+        cloudsAnimating = true;
       });
 
       const rocketStillMoving = distance > 0.7 || Math.abs(angleDifference) > 0.02 || Math.abs(rocketPosition.angleVelocity) > 0.005;
       const waitingForIgnition = pointerMoving && !engineActive;
-      if (pointerMoving || cloudStillMoving || rocketStillMoving || adjusting || waitingForIgnition) frame = requestAnimationFrame(tick);
+      if (pointerMoving || cloudsAnimating || rocketStillMoving || adjusting || waitingForIgnition) frame = requestAnimationFrame(tick);
       else frame = 0;
     };
 
@@ -206,7 +246,6 @@ function CustomCursor() {
         rocketPosition.velocityY = 0;
         rocketPosition.angle = 0;
         rocketPosition.angleVelocity = 0;
-        cloudPositions.forEach((point) => { point.x = event.clientX - 42; point.y = event.clientY + 38; point.opacity = 0; });
         initialized = true;
       } else {
         const movementX = event.clientX - position.x;
@@ -242,7 +281,7 @@ function CustomCursor() {
     const onPointerUp = (event: PointerEvent) => {
       window.clearTimeout(hideTimer);
       cursor.setAttribute("data-pressed", "false");
-      if (event.pointerType === "touch") hideTimer = window.setTimeout(hideCursor, 500);
+      if (event.pointerType === "touch") hideTimer = window.setTimeout(hideCursor, 900);
     };
     const onPointerLeave = () => hideCursor();
 
@@ -267,7 +306,7 @@ function CustomCursor() {
   }, []);
 
   return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-hover="false" data-pressed="false" data-adjusting="false" data-engine-active="false" data-correction-phase="none">
-    {[0, 1, 2, 3, 4].map((index) => <span className="rocket-cloud-puff" key={index} ref={(node) => { cloudRefs.current[index] = node; }} />)}
+    {Array.from({ length: 14 }, (_, index) => <span className="rocket-cloud-puff" key={index} ref={(node) => { cloudRefs.current[index] = node; }} />)}
     <span className="cursor-star" ref={starRef}><svg viewBox="0 0 12 12"><path d="M6 0.5 7.35 4.65 11.5 6 7.35 7.35 6 11.5 4.65 7.35.5 6 4.65 4.65 6 .5Z" /></svg></span>
     <span className="cursor-rocket" ref={rocketRef}><svg viewBox="0 0 28 28"><path className="rocket-fin" d="M9 13.5 4.5 20.5 9 19.3ZM19 13.5l4.5 7-4.5-1.2Z"/><path className="rocket-correction-jet" d="M8.8 15.5 6.3 18.5l2.6-.8Zm10.4 0 2.5 3-2.6-.8Z"/><path className="rocket-body" d="M14 2C10 5.6 8.5 10.5 8.5 17v2h11v-2C19.5 10.5 18 5.6 14 2Z"/><circle className="rocket-window" cx="14" cy="10.5" r="2.1"/><path className="rocket-flame" d="M11 19 14 26 17 19Z"/></svg></span>
   </div>;
