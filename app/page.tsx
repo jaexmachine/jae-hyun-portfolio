@@ -88,6 +88,7 @@ function CustomCursor() {
       puff.style.height = `${7 + index * 1.4}px`;
     });
     let pointerSpeed = 0;
+    let horizontalDirection = 1;
     let lastMoveAt = 0;
     let movementStartedAt = 0;
     let wasMoving = false;
@@ -180,10 +181,13 @@ function CustomCursor() {
       const upright = 0;
       const adjusting = !reducedMotion && adjustmentStartedAt > 0 && settleTime < 1100;
       const correctionPhase = !adjusting ? "none" : settleTime < 360 ? "right" : settleTime < 720 ? "left" : "settle";
+      const visualCorrectionPhase = horizontalDirection < 0
+        ? correctionPhase === "right" ? "left" : correctionPhase === "left" ? "right" : correctionPhase
+        : correctionPhase;
       const targetAngle = !pointerPresent
-        ? correctionPhase === "right" ? upright + 0.31 : correctionPhase === "left" ? upright - 0.18 : upright
+        ? correctionPhase === "right" ? upright + 0.31 * horizontalDirection : correctionPhase === "left" ? upright - 0.18 * horizontalDirection : upright
         : underCursor ? upright : Math.atan2(position.y - rocketPosition.y, position.x - rocketPosition.x) + Math.PI / 2;
-      const horizontalCorrection = reducedMotion ? 0 : correctionPhase === "right" ? 8 : correctionPhase === "left" ? -3 : 0;
+      const horizontalCorrection = reducedMotion ? 0 : correctionPhase === "right" ? 8 * horizontalDirection : correctionPhase === "left" ? -3 * horizontalDirection : 0;
       const targetX = !pointerPresent || followDelayActive ? rocketPosition.x : position.x + horizontalCorrection;
       const targetY = !pointerPresent || followDelayActive ? rocketPosition.y : position.y + 21;
       const distanceX = targetX - rocketPosition.x;
@@ -211,14 +215,14 @@ function CustomCursor() {
       }
       cursor.setAttribute("data-adjusting", adjusting ? "true" : "false");
       cursor.setAttribute("data-engine-active", engineActive ? "true" : "false");
-      cursor.setAttribute("data-correction-phase", correctionPhase);
+      cursor.setAttribute("data-correction-phase", visualCorrectionPhase);
       rocket.style.transform = `translate3d(${rocketPosition.x - 12}px, ${rocketPosition.y - 12}px, 0) rotate(${rocketPosition.angle}rad)`;
 
       const tailX = -Math.sin(rocketPosition.angle);
       const tailY = Math.cos(rocketPosition.angle);
       const engineX = rocketPosition.x + tailX * 14;
       const engineY = rocketPosition.y + tailY * 14;
-      const correctionSide = correctionPhase === "right" ? 1 : correctionPhase === "left" ? -1 : 0;
+      const correctionSide = visualCorrectionPhase === "right" ? 1 : visualCorrectionPhase === "left" ? -1 : 0;
       const emissionPeriod = engineActive ? 68 : adjusting && correctionSide !== 0 ? 82 : 0;
       if (!reducedMotion && emissionPeriod && now - cloudEmissionAt >= emissionPeriod) {
         const index = nextCloud;
@@ -296,6 +300,7 @@ function CustomCursor() {
         if (movement > 0.2) {
           const now = performance.now();
           if (!wasMoving || now - lastMoveAt > 200) movementStartedAt = now;
+          if (Math.abs(movementX) > 0.2) horizontalDirection = Math.sign(movementX);
           pointerSpeed = movement;
           wasMoving = true;
         }
@@ -362,6 +367,7 @@ export default function Home() {
   const [ready, setReady] = useState(false);
   const [toast, setToast] = useState("");
   const [activeNav, setActiveNav] = useState("research");
+  const [navDocked, setNavDocked] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
@@ -371,6 +377,13 @@ export default function Home() {
       : window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
     setTheme(initialTheme);
     document.documentElement.dataset.theme = initialTheme;
+  }, []);
+
+  useEffect(() => {
+    const updateDock = () => setNavDocked(window.scrollY > Math.max(120, window.innerHeight * 0.22));
+    updateDock();
+    window.addEventListener("scroll", updateDock, { passive: true });
+    return () => window.removeEventListener("scroll", updateDock);
   }, []);
 
   const toggleTheme = () => {
@@ -544,7 +557,7 @@ export default function Home() {
 
   return <main ref={root}>
     <div className="ambient-orb orb-a" /><div className="ambient-orb orb-b" />
-    <header className="topbar">
+    <header className={`topbar${navDocked ? " is-bottom-docked" : ""}`}>
       <a className="brand" href="#home" aria-label="Jae Hyun home"><span className="brand-mark"><Image className="brand-logo brand-logo-light" src="/rocket-j-light.png" alt="" width={1280} height={1280} /><Image className="brand-logo brand-logo-dark" src="/rocket-j-dark.png" alt="" width={1280} height={1280} priority /></span><span className="brand-name">jae hyun<br /><small>PORTFOLIO / 2026</small></span></a>
       <nav className="flex items-center gap-2 sm:gap-3 md:gap-8" aria-label="Main navigation"><a className={activeNav === "research" ? "is-active" : ""} aria-current={activeNav === "research" ? "location" : undefined} href="#research" onClick={() => setActiveNav("research")}>Work</a><a className={activeNav === "about" ? "is-active" : ""} aria-current={activeNav === "about" ? "location" : undefined} href="#about" onClick={() => setActiveNav("about")}>About</a><a className={activeNav === "experience" ? "is-active" : ""} aria-current={activeNav === "experience" ? "location" : undefined} href="#experience" onClick={() => setActiveNav("experience")}>Journey</a><a className={activeNav === "contact" ? "is-active" : ""} aria-current={activeNav === "contact" ? "location" : undefined} href="#contact" onClick={() => setActiveNav("contact")}>Contact</a></nav>
       <div className="top-actions"><span className="availability"><i /> OPEN TO OPPORTUNITIES</span><button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} aria-pressed={theme === "light"} title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}><span aria-hidden="true">{theme === "dark" ? "☼" : "☾"}</span></button><a className="contact-pill" href="#contact">Let’s talk <Arrow diagonal /></a></div>

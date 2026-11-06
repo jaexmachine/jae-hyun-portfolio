@@ -29,6 +29,8 @@ main:before{content:"";position:absolute;z-index:-2;inset:0;background-image:lin
 [data-build-scene].is-built .scene-progress i{transform:scaleX(1)!important}
 main{overflow:clip}
 .topbar{position:sticky;top:0;z-index:40;background:rgba(7,13,27,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.topbar{transition:transform .72s cubic-bezier(.2,.8,.2,1),width .45s ease,border-radius .4s ease,box-shadow .4s ease,border-color .4s ease}
+.topbar.is-bottom-docked{width:min(1120px,calc(100% - 32px));max-width:1120px;margin:0 auto;border:1px solid var(--line);border-radius:6px;box-shadow:0 16px 44px rgba(0,0,0,.32);transform:translateY(calc(100dvh - 100% - max(14px,env(safe-area-inset-bottom))))}
 .topbar nav a{position:relative;padding:12px 0;transition:color .25s ease}
 .topbar nav a:after{content:"";position:absolute;left:0;right:0;bottom:5px;height:1px;background:var(--mint);box-shadow:0 0 12px rgba(131,182,255,.5);transform:scaleX(0);transform-origin:left;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
 .topbar nav a:hover,.topbar nav a.is-active{color:var(--mint)}
