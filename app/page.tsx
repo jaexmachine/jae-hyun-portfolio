@@ -94,6 +94,7 @@ function CustomCursor() {
     let adjustmentStartedAt = 0;
     let hasAdjustedOnCatchup = false;
     let initialized = false;
+    let pointerPresent = false;
     let active = false;
     let frame = 0;
     let hideTimer = 0;
@@ -104,6 +105,7 @@ function CustomCursor() {
 
     const hideCursor = () => {
       active = false;
+      pointerPresent = false;
       cursor.setAttribute("data-visible", "false");
       cursor.setAttribute("data-pointer-present", "false");
       cursor.setAttribute("data-hover", "false");
@@ -133,22 +135,23 @@ function CustomCursor() {
     const pauseCursor = () => {
       window.clearTimeout(hideTimer);
       active = false;
+      pointerPresent = false;
       cursor.setAttribute("data-visible", "true");
       cursor.setAttribute("data-pointer-present", "false");
+      cursor.setAttribute("data-hover", "false");
+      cursor.setAttribute("data-pressed", "false");
       cursor.setAttribute("data-engine-active", "false");
-      cursor.setAttribute("data-adjusting", "false");
-      cursor.setAttribute("data-correction-phase", "none");
       root.classList.remove("has-custom-cursor");
       wasMoving = false;
       pointerSpeed = 0;
       movementStartedAt = 0;
-      cloudParticles.forEach((particle, index) => {
-        particle.active = false;
-        particle.opacity = 0;
-        clouds[index].style.opacity = "0";
-      });
-      if (frame) cancelAnimationFrame(frame);
-      frame = 0;
+      lastMoveAt = 0;
+      adjustmentStartedAt = performance.now();
+      hasAdjustedOnCatchup = true;
+      cursor.setAttribute("data-adjusting", reducedMotion ? "false" : "true");
+      cursor.setAttribute("data-correction-phase", reducedMotion ? "none" : "right");
+      active = true;
+      if (!frame) frame = requestAnimationFrame(tick);
     };
 
     const tick = () => {
@@ -162,24 +165,26 @@ function CustomCursor() {
       else if (wasMoving) { wasMoving = false; pointerSpeed = 0; movementStartedAt = 0; }
       const followDelayActive = !reducedMotion && pointerMoving && movementStartedAt > 0 && now - movementStartedAt < 165;
       const cursorGap = Math.hypot(position.x - rocketPosition.x, position.y + 21 - rocketPosition.y);
-      if (cursorGap > 48) {
-        hasAdjustedOnCatchup = false;
-        adjustmentStartedAt = 0;
-      } else if (!reducedMotion && !hasAdjustedOnCatchup && cursorGap < 26) {
-        hasAdjustedOnCatchup = true;
-        adjustmentStartedAt = now;
+      if (pointerPresent) {
+        if (cursorGap > 48) {
+          hasAdjustedOnCatchup = false;
+          adjustmentStartedAt = 0;
+        } else if (!reducedMotion && !hasAdjustedOnCatchup && cursorGap < 26) {
+          hasAdjustedOnCatchup = true;
+          adjustmentStartedAt = now;
+        }
       }
       const underCursor = cursorGap < 26;
       const settleTime = adjustmentStartedAt ? now - adjustmentStartedAt : 1000;
       const upright = 0;
       const adjusting = !reducedMotion && adjustmentStartedAt > 0 && settleTime < 820;
       const correctionPhase = !adjusting ? "none" : settleTime < 280 ? "right" : settleTime < 540 ? "left" : "settle";
-      const targetAngle = underCursor
-        ? upright
-        : Math.atan2(position.y - rocketPosition.y, position.x - rocketPosition.x) + Math.PI / 2;
+      const targetAngle = !pointerPresent
+        ? correctionPhase === "right" ? upright + 0.2 : correctionPhase === "left" ? upright - 0.09 : upright
+        : underCursor ? upright : Math.atan2(position.y - rocketPosition.y, position.x - rocketPosition.x) + Math.PI / 2;
       const horizontalCorrection = reducedMotion ? 0 : correctionPhase === "right" ? 8 : correctionPhase === "left" ? -3 : 0;
-      const targetX = followDelayActive ? rocketPosition.x : position.x + horizontalCorrection;
-      const targetY = followDelayActive ? rocketPosition.y : position.y + 21;
+      const targetX = !pointerPresent || followDelayActive ? rocketPosition.x : position.x + horizontalCorrection;
+      const targetY = !pointerPresent || followDelayActive ? rocketPosition.y : position.y + 21;
       const distanceX = targetX - rocketPosition.x;
       const distanceY = targetY - rocketPosition.y;
       const distance = Math.hypot(distanceX, distanceY);
@@ -187,7 +192,7 @@ function CustomCursor() {
         rocketPosition.x += distanceX * 0.46;
         rocketPosition.y += distanceY * 0.46;
       } else if (followDelayActive) {
-        // Hold position briefly before starting the constant-speed follow.
+        // Hold position briefly before starting the follow.
       } else {
         const followSpeed = 190 + Math.min(cursorGap * 0.75, 410);
         const followStep = Math.min(distance, followSpeed * delta);
@@ -275,6 +280,8 @@ function CustomCursor() {
 
       window.clearTimeout(hideTimer);
       if (event.pointerType === "mouse" || event.pointerType === "pen") root.classList.add("has-custom-cursor");
+      pointerPresent = true;
+      adjustmentStartedAt = 0;
       if (!initialized) {
         rocketPosition.x = event.clientX - 42;
         rocketPosition.y = event.clientY + 24;
