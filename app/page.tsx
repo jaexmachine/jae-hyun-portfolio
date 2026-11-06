@@ -111,11 +111,11 @@ function CustomCursor() {
       else if (wasMoving) { wasMoving = false; idleSince = now; }
       const settleTime = idleSince ? now - idleSince : 1000;
       const upright = 0;
-      const adjusting = !reducedMotion && idleSince > 0 && settleTime < 340;
+      const adjusting = !reducedMotion && idleSince > 0 && settleTime < 500;
       const targetAngle = pointerMoving && pointerSpeed > 0.4
         ? pointerAngle + Math.PI / 2
-        : reducedMotion ? upright : settleTime < 140 ? upright + 0.16 : settleTime < 280 ? upright - 0.075 : upright;
-      const horizontalCorrection = reducedMotion ? 0 : settleTime < 140 ? 7 : settleTime < 280 ? -2.5 : 0;
+        : reducedMotion ? upright : settleTime < 180 ? upright + 0.22 : settleTime < 360 ? upright - 0.11 : upright;
+      const horizontalCorrection = reducedMotion ? 0 : settleTime < 180 ? 9 : settleTime < 360 ? -4 : 0;
       const targetX = position.x + horizontalCorrection;
       const targetY = position.y + 21;
       const distanceX = targetX - rocketPosition.x;
@@ -125,8 +125,8 @@ function CustomCursor() {
         rocketPosition.x += distanceX * 0.46;
         rocketPosition.y += distanceY * 0.46;
       } else {
-        rocketPosition.velocityX = (rocketPosition.velocityX + distanceX * 0.12) * 0.72;
-        rocketPosition.velocityY = (rocketPosition.velocityY + distanceY * 0.12) * 0.72;
+        rocketPosition.velocityX = (rocketPosition.velocityX + distanceX * 0.09) * 0.75;
+        rocketPosition.velocityY = (rocketPosition.velocityY + distanceY * 0.09) * 0.75;
         rocketPosition.x += rocketPosition.velocityX;
         rocketPosition.y += rocketPosition.velocityY;
       }
@@ -134,7 +134,7 @@ function CustomCursor() {
       const angleDifference = Math.atan2(Math.sin(targetAngle - rocketPosition.angle), Math.cos(targetAngle - rocketPosition.angle));
       if (reducedMotion) rocketPosition.angle += angleDifference * 0.42;
       else {
-        rocketPosition.angleVelocity = (rocketPosition.angleVelocity + angleDifference * 0.1) * 0.74;
+        rocketPosition.angleVelocity = (rocketPosition.angleVelocity + angleDifference * 0.12) * 0.73;
         rocketPosition.angle += rocketPosition.angleVelocity;
       }
       cursor.setAttribute("data-adjusting", adjusting ? "true" : "false");
@@ -233,7 +233,7 @@ function CustomCursor() {
   return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-hover="false" data-pressed="false">
     {[0, 1, 2, 3].map((index) => <span className="cursor-trail-dot" key={index} ref={(node) => { trailRefs.current[index] = node; }} />)}
     <span className="cursor-star" ref={starRef}><svg viewBox="0 0 12 12"><path d="M6 0.5 7.35 4.65 11.5 6 7.35 7.35 6 11.5 4.65 7.35.5 6 4.65 4.65 6 .5Z" /></svg></span>
-    <span className="cursor-rocket" ref={rocketRef}><svg viewBox="0 0 28 28"><path className="rocket-fin" d="M9 13.5 4.5 20.5 9 19.3ZM19 13.5l4.5 7-4.5-1.2Z"/><path className="rocket-body" d="M14 2C10 5.6 8.5 10.5 8.5 17v2h11v-2C19.5 10.5 18 5.6 14 2Z"/><circle className="rocket-window" cx="14" cy="10.5" r="2.1"/><path className="rocket-flame" d="M11 19 14 26 17 19Z"/></svg></span>
+    <span className="cursor-rocket" ref={rocketRef}><svg viewBox="0 0 28 28"><path className="rocket-fin" d="M9 13.5 4.5 20.5 9 19.3ZM19 13.5l4.5 7-4.5-1.2Z"/><path className="rocket-correction-jet" d="M8.8 15.5 6.3 18.5l2.6-.8Zm10.4 0 2.5 3-2.6-.8Z"/><path className="rocket-body" d="M14 2C10 5.6 8.5 10.5 8.5 17v2h11v-2C19.5 10.5 18 5.6 14 2Z"/><circle className="rocket-window" cx="14" cy="10.5" r="2.1"/><path className="rocket-flame" d="M11 19 14 26 17 19Z"/></svg></span>
   </div>;
 }
 
