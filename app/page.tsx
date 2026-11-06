@@ -367,7 +367,7 @@ export default function Home() {
   const [ready, setReady] = useState(false);
   const [toast, setToast] = useState("");
   const [activeNav, setActiveNav] = useState("research");
-  const [navDocked, setNavDocked] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
@@ -380,10 +380,23 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const updateDock = () => setNavDocked(window.scrollY > Math.max(120, window.innerHeight * 0.22));
-    updateDock();
-    window.addEventListener("scroll", updateDock, { passive: true });
-    return () => window.removeEventListener("scroll", updateDock);
+    let lastToggleY = window.scrollY;
+    const updateNav = () => {
+      const y = window.scrollY;
+      if (y < 100) {
+        setNavHidden(false);
+        lastToggleY = y;
+      } else if (y > lastToggleY + 18) {
+        setNavHidden(true);
+        lastToggleY = y;
+      } else if (y < lastToggleY - 18) {
+        setNavHidden(false);
+        lastToggleY = y;
+      }
+    };
+    updateNav();
+    window.addEventListener("scroll", updateNav, { passive: true });
+    return () => window.removeEventListener("scroll", updateNav);
   }, []);
 
   const toggleTheme = () => {
@@ -557,7 +570,7 @@ export default function Home() {
 
   return <main ref={root}>
     <div className="ambient-orb orb-a" /><div className="ambient-orb orb-b" />
-    <header className={`topbar${navDocked ? " is-bottom-docked" : ""}`}>
+    <header className={`topbar${navHidden ? " is-hidden" : ""}`}>
       <a className="brand" href="#home" aria-label="Jae Hyun home"><span className="brand-mark"><Image className="brand-logo brand-logo-light" src="/rocket-j-light.png" alt="" width={1280} height={1280} /><Image className="brand-logo brand-logo-dark" src="/rocket-j-dark.png" alt="" width={1280} height={1280} priority /></span><span className="brand-name">jae hyun<br /><small>PORTFOLIO / 2026</small></span></a>
       <nav className="flex items-center gap-2 sm:gap-3 md:gap-8" aria-label="Main navigation"><a className={activeNav === "research" ? "is-active" : ""} aria-current={activeNav === "research" ? "location" : undefined} href="#research" onClick={() => setActiveNav("research")}>Work</a><a className={activeNav === "about" ? "is-active" : ""} aria-current={activeNav === "about" ? "location" : undefined} href="#about" onClick={() => setActiveNav("about")}>About</a><a className={activeNav === "experience" ? "is-active" : ""} aria-current={activeNav === "experience" ? "location" : undefined} href="#experience" onClick={() => setActiveNav("experience")}>Journey</a><a className={activeNav === "contact" ? "is-active" : ""} aria-current={activeNav === "contact" ? "location" : undefined} href="#contact" onClick={() => setActiveNav("contact")}>Contact</a></nav>
       <div className="top-actions"><span className="availability"><i /> OPEN TO OPPORTUNITIES</span><button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} aria-pressed={theme === "light"} title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}><span aria-hidden="true">{theme === "dark" ? "☼" : "☾"}</span></button><a className="contact-pill" href="#contact">Let’s talk <Arrow diagonal /></a></div>
