@@ -101,7 +101,7 @@ html.has-custom-cursor,html.has-custom-cursor *{cursor:none!important}
 .rocket-body,.rocket-fin{fill:currentColor}
 .rocket-fin{transform-origin:14px 14px}
 .rocket-window{fill:var(--mint)}
-.rocket-flame{fill:var(--mint);transform-origin:4px 20px}
+.rocket-flame{fill:var(--mint);transform-origin:14px 22px}
 .custom-cursor[data-hover="true"] .rocket-flame{animation:rocket-burn .12s ease-in-out infinite alternate;filter:brightness(1.35)}
 .custom-cursor[data-adjusting="true"] .rocket-flame{animation:rocket-burn .09s ease-in-out infinite alternate;filter:brightness(1.3)}
 .custom-cursor[data-adjusting="true"] .rocket-fin{animation:rocket-gimbal .16s ease-in-out 2 alternate}

@@ -79,7 +79,7 @@ function CustomCursor() {
     const trail = trailRefs.current.filter((dot): dot is HTMLSpanElement => dot !== null);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const position = { x: -100, y: -100 };
-    const rocketPosition = { x: -140, y: -100, angle: -Math.PI / 2, velocityX: 0, velocityY: 0, angleVelocity: 0 };
+    const rocketPosition = { x: -140, y: -100, angle: 0, velocityX: 0, velocityY: 0, angleVelocity: 0 };
     const trailPositions = trail.map(() => ({ x: -100, y: -100 }));
     const cursor = star.closest<HTMLElement>(".custom-cursor");
     if (!cursor) return;
@@ -110,10 +110,10 @@ function CustomCursor() {
       if (pointerMoving && pointerSpeed > 0.4) wasMoving = true;
       else if (wasMoving) { wasMoving = false; idleSince = now; }
       const settleTime = idleSince ? now - idleSince : 1000;
-      const upright = -Math.PI / 2;
+      const upright = 0;
       const adjusting = !reducedMotion && idleSince > 0 && settleTime < 340;
       const targetAngle = pointerMoving && pointerSpeed > 0.4
-        ? pointerAngle
+        ? pointerAngle + Math.PI / 2
         : reducedMotion ? upright : settleTime < 140 ? upright + 0.16 : settleTime < 280 ? upright - 0.075 : upright;
       const horizontalCorrection = reducedMotion ? 0 : settleTime < 140 ? 7 : settleTime < 280 ? -2.5 : 0;
       const targetX = position.x + horizontalCorrection;
@@ -233,7 +233,7 @@ function CustomCursor() {
   return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-hover="false" data-pressed="false">
     {[0, 1, 2, 3].map((index) => <span className="cursor-trail-dot" key={index} ref={(node) => { trailRefs.current[index] = node; }} />)}
     <span className="cursor-star" ref={starRef}><svg viewBox="0 0 12 12"><path d="M6 0.5 7.35 4.65 11.5 6 7.35 7.35 6 11.5 4.65 7.35.5 6 4.65 4.65 6 .5Z" /></svg></span>
-    <span className="cursor-rocket" ref={rocketRef}><svg viewBox="0 0 28 28"><path className="rocket-body" d="M26 3C17 3.5 10.3 6.3 6.5 11.8c-2.1 3-2.5 6.1-2.4 9.2 3.1.1 6.2-.3 9.2-2.4C18.8 14.8 21.6 8 26 3Z"/><circle className="rocket-window" cx="17" cy="10" r="2.1"/><path className="rocket-fin" d="m8 13-5-1.5 2.2 5.8M12 18l-1.6 5 5.8-2.2"/><path className="rocket-flame" d="m4.3 19.7-2.7 4 4.1-1.6"/></svg></span>
+    <span className="cursor-rocket" ref={rocketRef}><svg viewBox="0 0 28 28"><path className="rocket-fin" d="M9 13.5 4.5 20.5 9 19.3ZM19 13.5l4.5 7-4.5-1.2Z"/><path className="rocket-body" d="M14 2C10 5.6 8.5 10.5 8.5 17v2h11v-2C19.5 10.5 18 5.6 14 2Z"/><circle className="rocket-window" cx="14" cy="10.5" r="2.1"/><path className="rocket-flame" d="M11 19 14 26 17 19Z"/></svg></span>
   </div>;
 }
 
