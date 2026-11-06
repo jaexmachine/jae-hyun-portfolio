@@ -87,3 +87,21 @@ html[data-theme="light"] .toast{background:#fff;color:#14213a;border-color:rgba(
 @media(max-width:680px){.topbar nav{font-size:7px;letter-spacing:.035em}.topbar nav a:nth-child(3){display:inline-flex}}
 @media(max-width:360px){.topbar nav{margin-left:auto}.contact-pill{display:none}}
 @media(max-width:420px){.details-grid{row-gap:11px}}
+html.has-custom-cursor,html.has-custom-cursor *{cursor:none!important}
+.custom-cursor{position:fixed;inset:0;z-index:110;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .18s ease,visibility .18s ease}
+.custom-cursor[data-visible="true"]{opacity:1;visibility:visible}
+.cursor-star,.cursor-rocket,.cursor-trail-dot{position:fixed;top:0;left:0;pointer-events:none;will-change:transform}
+.cursor-star{z-index:3;width:6px;height:6px;color:var(--mint)}
+.cursor-star svg{display:block;width:100%;height:100%;fill:currentColor;filter:drop-shadow(0 0 4px rgba(131,182,255,.9));transition:transform .2s ease}
+.cursor-star:after{content:"";position:absolute;inset:-7px;border:1px solid var(--mint);border-radius:50%;opacity:0;transform:scale(.45);transition:opacity .2s ease,transform .24s cubic-bezier(.2,.8,.2,1)}
+.custom-cursor[data-hover="true"] .cursor-star svg{transform:scale(1.45)}
+.custom-cursor[data-pressed="true"] .cursor-star:after{opacity:.72;transform:scale(1.15)}
+.cursor-rocket{z-index:2;width:26px;height:26px;color:var(--ink);transform-origin:center;filter:drop-shadow(0 2px 5px rgba(0,0,0,.22))}
+.cursor-rocket svg{width:100%;height:100%;overflow:visible}
+.rocket-body,.rocket-fin{fill:currentColor}
+.rocket-window{fill:var(--mint)}
+.rocket-flame{fill:var(--mint);transform-origin:4px 20px;animation:rocket-burn .26s ease-in-out infinite alternate}
+.custom-cursor[data-hover="true"] .rocket-flame{animation-duration:.12s;filter:brightness(1.35)}
+.cursor-trail-dot{z-index:1;width:4px;height:4px;border-radius:50%;background:var(--mint);box-shadow:0 0 9px rgba(131,182,255,.65);opacity:0;transition:opacity .2s ease}
+@keyframes rocket-burn{from{transform:scale(.78)}to{transform:scale(1.13)}}
+@media(prefers-reduced-motion:reduce){.cursor-trail-dot{display:none}.rocket-flame{animation:none!important}}

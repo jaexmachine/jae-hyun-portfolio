@@ -65,6 +65,158 @@ function ProjectDisclosure({ id, children }: { id: string; children: React.React
   </div>;
 }
 
+function CustomCursor() {
+  const starRef = useRef<HTMLSpanElement>(null);
+  const rocketRef = useRef<HTMLSpanElement>(null);
+  const trailRefs = useRef<Array<HTMLSpanElement | null>>([]);
+
+  useEffect(() => {
+    const star = starRef.current;
+    const rocket = rocketRef.current;
+    if (!star || !rocket) return;
+
+    const root = document.documentElement;
+    const trail = trailRefs.current.filter((dot): dot is HTMLSpanElement => dot !== null);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const position = { x: -100, y: -100 };
+    const rocketPosition = { x: -140, y: -100, angle: 0 };
+    const trailPositions = trail.map(() => ({ x: -100, y: -100 }));
+    const cursor = star.closest<HTMLElement>(".custom-cursor");
+    if (!cursor) return;
+    let pointerAngle = 0;
+    let pointerSpeed = 0;
+    let lastMoveAt = 0;
+    let initialized = false;
+    let active = false;
+    let frame = 0;
+    let hideTimer = 0;
+
+    const hideCursor = () => {
+      active = false;
+      cursor.setAttribute("data-visible", "false");
+      cursor.setAttribute("data-hover", "false");
+      cursor.setAttribute("data-pressed", "false");
+      root.classList.remove("has-custom-cursor");
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+    };
+
+    const tick = () => {
+      if (!active) { frame = 0; return; }
+      const now = performance.now();
+      const pointerMoving = now - lastMoveAt < 120;
+      const moveAngle = pointerMoving && pointerSpeed > 0.4 ? pointerAngle : Math.atan2(position.y - rocketPosition.y, position.x - rocketPosition.x);
+      const headingX = Math.cos(moveAngle);
+      const headingY = Math.sin(moveAngle);
+      const targetX = position.x - headingX * 14;
+      const targetY = position.y - headingY * 14;
+      const distanceX = targetX - rocketPosition.x;
+      const distanceY = targetY - rocketPosition.y;
+      const distance = Math.hypot(distanceX, distanceY);
+      const catchUp = reducedMotion ? 0.38 : Math.min(0.28, 0.09 + distance * 0.0016);
+      rocketPosition.x += distanceX * catchUp;
+      rocketPosition.y += distanceY * catchUp;
+
+      const aim = Math.atan2(position.y - rocketPosition.y, position.x - rocketPosition.x);
+      const angleDifference = Math.atan2(Math.sin(aim - rocketPosition.angle), Math.cos(aim - rocketPosition.angle));
+      rocketPosition.angle += angleDifference * (reducedMotion ? 0.42 : 0.2);
+      rocket.style.transform = `translate3d(${rocketPosition.x - 12}px, ${rocketPosition.y - 12}px, 0) rotate(${rocketPosition.angle}rad)`;
+
+      let trailStillMoving = false;
+      let followX = position.x;
+      let followY = position.y;
+      trailPositions.forEach((point, index) => {
+        const dx = followX - point.x;
+        const dy = followY - point.y;
+        point.x += dx * (reducedMotion ? 0.42 : 0.24);
+        point.y += dy * (reducedMotion ? 0.42 : 0.24);
+        if (Math.hypot(dx, dy) > 0.7) trailStillMoving = true;
+        trail[index].style.transform = `translate3d(${point.x - 2}px, ${point.y - 2}px, 0)`;
+        trail[index].style.opacity = pointerMoving ? `${Math.max(0.08, 0.4 - index * 0.075)}` : "0";
+        followX = point.x;
+        followY = point.y;
+      });
+
+      const rocketStillMoving = distance > 0.7 || Math.abs(angleDifference) > 0.02;
+      if (pointerMoving || trailStillMoving || rocketStillMoving) frame = requestAnimationFrame(tick);
+      else frame = 0;
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      const target = event.target;
+      const element = target instanceof Element ? target : null;
+      const textEntry = element?.closest("input, textarea, select, [contenteditable='true']");
+      if (textEntry && (event.pointerType === "mouse" || event.pointerType === "pen")) {
+        hideCursor();
+        return;
+      }
+
+      window.clearTimeout(hideTimer);
+      if (event.pointerType === "mouse" || event.pointerType === "pen") root.classList.add("has-custom-cursor");
+      if (!initialized) {
+        rocketPosition.x = event.clientX - 42;
+        rocketPosition.y = event.clientY + 24;
+        trailPositions.forEach((point) => { point.x = event.clientX; point.y = event.clientY; });
+        initialized = true;
+      } else {
+        const movementX = event.clientX - position.x;
+        const movementY = event.clientY - position.y;
+        const movement = Math.hypot(movementX, movementY);
+        if (movement > 0.2) {
+          pointerAngle = Math.atan2(movementY, movementX);
+          pointerSpeed = movement;
+        }
+      }
+
+      position.x = event.clientX;
+      position.y = event.clientY;
+      lastMoveAt = performance.now();
+      active = true;
+      cursor.setAttribute("data-visible", "true");
+      cursor.setAttribute("data-hover", element?.closest("a, button, [role='button']") ? "true" : "false");
+      star.style.transform = `translate3d(${position.x - 3}px, ${position.y - 3}px, 0)`;
+
+      if (!frame) frame = requestAnimationFrame(tick);
+      if (event.pointerType === "touch") hideTimer = window.setTimeout(hideCursor, 700);
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      onPointerMove(event);
+      cursor.setAttribute("data-pressed", "true");
+    };
+    const onPointerUp = (event: PointerEvent) => {
+      cursor.setAttribute("data-pressed", "false");
+      if (event.pointerType === "touch") hideTimer = window.setTimeout(hideCursor, 500);
+    };
+    const onPointerLeave = () => hideCursor();
+
+    document.addEventListener("pointermove", onPointerMove, { passive: true });
+    document.addEventListener("pointerdown", onPointerDown, { passive: true });
+    window.addEventListener("pointerup", onPointerUp, { passive: true });
+    window.addEventListener("pointercancel", onPointerUp, { passive: true });
+    document.documentElement.addEventListener("pointerleave", onPointerLeave);
+    window.addEventListener("blur", onPointerLeave);
+
+    return () => {
+      window.clearTimeout(hideTimer);
+      if (frame) cancelAnimationFrame(frame);
+      root.classList.remove("has-custom-cursor");
+      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
+      document.documentElement.removeEventListener("pointerleave", onPointerLeave);
+      window.removeEventListener("blur", onPointerLeave);
+    };
+  }, []);
+
+  return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-hover="false" data-pressed="false">
+    {[0, 1, 2, 3].map((index) => <span className="cursor-trail-dot" key={index} ref={(node) => { trailRefs.current[index] = node; }} />)}
+    <span className="cursor-star" ref={starRef}><svg viewBox="0 0 12 12"><path d="M6 0.5 7.35 4.65 11.5 6 7.35 7.35 6 11.5 4.65 7.35.5 6 4.65 4.65 6 .5Z" /></svg></span>
+    <span className="cursor-rocket" ref={rocketRef}><svg viewBox="0 0 28 28"><path className="rocket-body" d="M26 3C17 3.5 10.3 6.3 6.5 11.8c-2.1 3-2.5 6.1-2.4 9.2 3.1.1 6.2-.3 9.2-2.4C18.8 14.8 21.6 8 26 3Z"/><circle className="rocket-window" cx="17" cy="10" r="2.1"/><path className="rocket-fin" d="m8 13-5-1.5 2.2 5.8M12 18l-1.6 5 5.8-2.2"/><path className="rocket-flame" d="m4.3 19.7-2.7 4 4.1-1.6"/></svg></span>
+  </div>;
+}
+
 export default function Home() {
   const root = useRef<HTMLElement>(null);
   const [ready, setReady] = useState(false);
@@ -336,5 +488,6 @@ export default function Home() {
     <footer className="footer"><a className="brand" href="#home" aria-label="Back to Jae Hyun home"><span className="brand-mark"><Image className="brand-logo brand-logo-light" src="/rocket-j-light.png" alt="" width={1280} height={1280} /><Image className="brand-logo brand-logo-dark" src="/rocket-j-dark.png" alt="" width={1280} height={1280} /></span><span className="brand-name">jae hyun<br/><small>PORTFOLIO / 2026</small></span></a><span>A PORTFOLIO IN PROGRESS <i>✳</i></span><a href="#home">BACK TO TOP ↑</a></footer>
     <button className="skip-build" onClick={finishBuild} aria-label="Skip the build animation">Skip build <span>↗</span></button>
     <div className={`toast ${toast ? "show" : ""}`} role="status" aria-live="polite">{toast}<span>✓</span></div>
+    <CustomCursor />
   </main>;
 }
