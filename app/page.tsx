@@ -133,11 +133,11 @@ function CustomCursor() {
       const now = performance.now();
       const delta = previousFrameAt ? Math.min((now - previousFrameAt) / 1000, 0.06) : 1 / 60;
       previousFrameAt = now;
-      const pointerMoving = now - lastMoveAt < 120;
-      const engineActive = pointerMoving && movementStartedAt > 0 && now - movementStartedAt >= 125;
+      const pointerMoving = now - lastMoveAt < 200;
+      const engineActive = pointerMoving && movementStartedAt > 0 && now - movementStartedAt >= 175;
       if (pointerMoving && pointerSpeed > 0.4) wasMoving = true;
       else if (wasMoving) { wasMoving = false; idleSince = now; pointerSpeed = 0; movementStartedAt = 0; }
-      const followDelayActive = !reducedMotion && pointerMoving && movementStartedAt > 0 && now - movementStartedAt < 110;
+      const followDelayActive = !reducedMotion && pointerMoving && movementStartedAt > 0 && now - movementStartedAt < 165;
       const settleTime = idleSince ? now - idleSince : 1000;
       const upright = 0;
       const adjusting = !reducedMotion && idleSince > 0 && settleTime < 820;
@@ -159,8 +159,8 @@ function CustomCursor() {
         rocketPosition.velocityY = 0;
       } else {
         const ignitionDelay = pointerMoving && !engineActive ? 0.42 : engineActive ? 1 : 0.82;
-        rocketPosition.velocityX = (rocketPosition.velocityX + distanceX * 0.09 * ignitionDelay) * 0.75;
-        rocketPosition.velocityY = (rocketPosition.velocityY + distanceY * 0.09 * ignitionDelay) * 0.75;
+        rocketPosition.velocityX = (rocketPosition.velocityX + distanceX * 0.045 * ignitionDelay) * 0.82;
+        rocketPosition.velocityY = (rocketPosition.velocityY + distanceY * 0.045 * ignitionDelay) * 0.82;
         rocketPosition.x += rocketPosition.velocityX;
         rocketPosition.y += rocketPosition.velocityY;
       }
@@ -257,7 +257,7 @@ function CustomCursor() {
         const movement = Math.hypot(movementX, movementY);
         if (movement > 0.2) {
           const now = performance.now();
-          if (!wasMoving || now - lastMoveAt > 120) movementStartedAt = now;
+          if (!wasMoving || now - lastMoveAt > 200) movementStartedAt = now;
           pointerAngle = Math.atan2(movementY, movementX);
           pointerSpeed = movement;
           wasMoving = true;
