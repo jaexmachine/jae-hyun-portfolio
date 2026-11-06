@@ -105,6 +105,7 @@ function CustomCursor() {
     const hideCursor = () => {
       active = false;
       cursor.setAttribute("data-visible", "false");
+      cursor.setAttribute("data-pointer-present", "false");
       cursor.setAttribute("data-hover", "false");
       cursor.setAttribute("data-pressed", "false");
       cursor.setAttribute("data-engine-active", "false");
@@ -125,6 +126,27 @@ function CustomCursor() {
       nextCloud = 0;
       cloudEmissionAt = 0;
       previousFrameAt = 0;
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+    };
+
+    const pauseCursor = () => {
+      window.clearTimeout(hideTimer);
+      active = false;
+      cursor.setAttribute("data-visible", "true");
+      cursor.setAttribute("data-pointer-present", "false");
+      cursor.setAttribute("data-engine-active", "false");
+      cursor.setAttribute("data-adjusting", "false");
+      cursor.setAttribute("data-correction-phase", "none");
+      root.classList.remove("has-custom-cursor");
+      wasMoving = false;
+      pointerSpeed = 0;
+      movementStartedAt = 0;
+      cloudParticles.forEach((particle, index) => {
+        particle.active = false;
+        particle.opacity = 0;
+        clouds[index].style.opacity = "0";
+      });
       if (frame) cancelAnimationFrame(frame);
       frame = 0;
     };
@@ -167,7 +189,8 @@ function CustomCursor() {
       } else if (followDelayActive) {
         // Hold position briefly before starting the constant-speed follow.
       } else {
-        const followStep = Math.min(distance, 185 * delta);
+        const followSpeed = 190 + Math.min(cursorGap * 0.75, 410);
+        const followStep = Math.min(distance, followSpeed * delta);
         if (distance > 0) {
           rocketPosition.x += distanceX / distance * followStep;
           rocketPosition.y += distanceY / distance * followStep;
@@ -275,6 +298,7 @@ function CustomCursor() {
       lastMoveAt = performance.now();
       active = true;
       cursor.setAttribute("data-visible", "true");
+      cursor.setAttribute("data-pointer-present", "true");
       cursor.setAttribute("data-hover", element?.closest("a, button, [role='button']") ? "true" : "false");
       cursor.setAttribute("data-adjusting", "false");
       cursor.setAttribute("data-correction-phase", "none");
@@ -293,7 +317,7 @@ function CustomCursor() {
       cursor.setAttribute("data-pressed", "false");
       if (event.pointerType === "touch") hideTimer = window.setTimeout(hideCursor, 900);
     };
-    const onPointerLeave = () => hideCursor();
+    const onPointerLeave = () => pauseCursor();
 
     document.addEventListener("pointermove", onPointerMove, { passive: true });
     document.addEventListener("pointerdown", onPointerDown, { passive: true });
@@ -315,7 +339,7 @@ function CustomCursor() {
     };
   }, []);
 
-  return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-hover="false" data-pressed="false" data-adjusting="false" data-engine-active="false" data-correction-phase="none">
+  return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-pointer-present="false" data-hover="false" data-pressed="false" data-adjusting="false" data-engine-active="false" data-correction-phase="none">
     {Array.from({ length: 14 }, (_, index) => <span className="rocket-cloud-puff" key={index} ref={(node) => { cloudRefs.current[index] = node; }} />)}
     <span className="cursor-star" ref={starRef}><svg viewBox="0 0 12 12"><path d="M6 0.5 7.35 4.65 11.5 6 7.35 7.35 6 11.5 4.65 7.35.5 6 4.65 4.65 6 .5Z" /></svg></span>
     <span className="cursor-rocket" ref={rocketRef}><svg viewBox="0 0 28 28"><path className="rocket-fin" d="M9 13.5 4.5 20.5 9 19.3ZM19 13.5l4.5 7-4.5-1.2Z"/><path className="rocket-correction-jet" d="M8.8 15.5 6.3 18.5l2.6-.8Zm10.4 0 2.5 3-2.6-.8Z"/><path className="rocket-body" d="M14 2C10 5.6 8.5 10.5 8.5 17v2h11v-2C19.5 10.5 18 5.6 14 2Z"/><circle className="rocket-window" cx="14" cy="10.5" r="2.1"/><path className="rocket-flame" d="M11 19 14 26 17 19Z"/></svg></span>
