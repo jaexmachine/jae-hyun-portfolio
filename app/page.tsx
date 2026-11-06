@@ -79,7 +79,7 @@ function CustomCursor() {
     const clouds = cloudRefs.current.filter((puff): puff is HTMLSpanElement => puff !== null);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const position = { x: -100, y: -100 };
-    const rocketPosition = { x: -140, y: -100, angle: 0, velocityX: 0, velocityY: 0, angleVelocity: 0 };
+    const rocketPosition = { x: -140, y: -100, angle: 0, angleVelocity: 0 };
     const cloudParticles = clouds.map(() => ({ x: 0, y: 0, vx: 0, vy: 0, age: 0, life: 0, size: 0, opacity: 0, active: false }));
     const cursor = star.closest<HTMLElement>(".custom-cursor");
     if (!cursor) return;
@@ -155,14 +155,13 @@ function CustomCursor() {
         rocketPosition.x += distanceX * 0.46;
         rocketPosition.y += distanceY * 0.46;
       } else if (followDelayActive) {
-        rocketPosition.velocityX = 0;
-        rocketPosition.velocityY = 0;
+        // Hold position briefly before starting the constant-speed follow.
       } else {
-        const ignitionDelay = pointerMoving && !engineActive ? 0.42 : engineActive ? 1 : 0.82;
-        rocketPosition.velocityX = (rocketPosition.velocityX + distanceX * 0.012 * ignitionDelay) * 0.86;
-        rocketPosition.velocityY = (rocketPosition.velocityY + distanceY * 0.012 * ignitionDelay) * 0.86;
-        rocketPosition.x += rocketPosition.velocityX;
-        rocketPosition.y += rocketPosition.velocityY;
+        const followStep = Math.min(distance, 145 * delta);
+        if (distance > 0) {
+          rocketPosition.x += distanceX / distance * followStep;
+          rocketPosition.y += distanceY / distance * followStep;
+        }
       }
 
       const angleDifference = Math.atan2(Math.sin(targetAngle - rocketPosition.angle), Math.cos(targetAngle - rocketPosition.angle));
@@ -246,8 +245,6 @@ function CustomCursor() {
       if (!initialized) {
         rocketPosition.x = event.clientX - 42;
         rocketPosition.y = event.clientY + 24;
-        rocketPosition.velocityX = 0;
-        rocketPosition.velocityY = 0;
         rocketPosition.angle = 0;
         rocketPosition.angleVelocity = 0;
         initialized = true;
