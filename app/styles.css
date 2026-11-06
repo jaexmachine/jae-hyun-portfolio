@@ -107,11 +107,12 @@ html.has-custom-cursor,html.has-custom-cursor *{cursor:none!important}
 .rocket-flame{fill:var(--mint);transform-origin:14px 22px}
 .custom-cursor[data-hover="true"] .rocket-flame{animation:rocket-burn .12s ease-in-out infinite alternate;filter:brightness(1.35)}
 .custom-cursor[data-adjusting="true"] .cursor-rocket{filter:drop-shadow(0 0 8px rgba(131,182,255,.58))}
-.custom-cursor[data-adjusting="true"] .cursor-rocket:before{opacity:1;animation:rocket-correction-glow .24s ease-in-out infinite alternate}
-.custom-cursor[data-adjusting="true"] .cursor-rocket:after{opacity:.9;animation:rocket-plume .11s ease-in-out infinite alternate}
-.custom-cursor[data-adjusting="true"] .rocket-flame{animation:rocket-burn .11s ease-in-out infinite alternate;filter:brightness(1.55)}
-.custom-cursor[data-adjusting="true"] .rocket-fin{animation:rocket-gimbal .22s ease-in-out 2 alternate}
-.custom-cursor[data-adjusting="true"] .rocket-correction-jet{animation:rocket-side-jet .14s ease-in-out 3 alternate}
+.custom-cursor[data-adjusting="true"] .cursor-rocket:before{opacity:1;animation:rocket-correction-glow .38s ease-in-out infinite alternate}
+.custom-cursor[data-adjusting="true"] .cursor-rocket:after{opacity:.95;animation:rocket-plume .22s ease-in-out infinite alternate}
+.custom-cursor[data-adjusting="true"] .rocket-flame{animation:rocket-burn .2s ease-in-out infinite alternate;filter:brightness(1.7)}
+.custom-cursor[data-adjusting="true"] .rocket-fin{animation:rocket-gimbal .36s ease-in-out 2 alternate}
+.custom-cursor[data-correction-phase="right"] .rocket-correction-jet{animation:rocket-side-right .34s ease-in-out infinite alternate}
+.custom-cursor[data-correction-phase="left"] .rocket-correction-jet{animation:rocket-side-left .34s ease-in-out infinite alternate}
 .rocket-cloud-puff{z-index:1;border-radius:50%;background:radial-gradient(ellipse,rgba(220,234,255,.82) 0%,rgba(131,182,255,.48) 48%,rgba(131,182,255,.08) 76%,transparent 100%);filter:blur(1.7px);opacity:0;transition:opacity .18s ease}
 .rocket-cloud-puff:before,.rocket-cloud-puff:after{content:"";position:absolute;width:74%;height:88%;top:-18%;border-radius:50%;background:inherit;filter:blur(1px)}
 .rocket-cloud-puff:before{left:-20%}
@@ -123,5 +124,6 @@ html[data-theme="light"] .rocket-cloud-puff{background:radial-gradient(ellipse,r
 @keyframes rocket-gimbal{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
 @keyframes rocket-correction-glow{from{transform:scale(.62);opacity:.5}to{transform:scale(1.08);opacity:1}}
 @keyframes rocket-plume{from{transform:translateX(-50%) scaleY(.45);opacity:.5}to{transform:translateX(-50%) scaleY(1.3);opacity:1}}
-@keyframes rocket-side-jet{from{opacity:.2;transform:scale(.7)}to{opacity:1;transform:scale(1.35)}}
+@keyframes rocket-side-right{from{opacity:.35;transform:translateX(0) scale(.8)}to{opacity:1;transform:translateX(1px) scale(1.3)}}
+@keyframes rocket-side-left{from{opacity:.35;transform:translateX(0) scale(.8)}to{opacity:1;transform:translateX(-1px) scale(1.3)}}
 @media(prefers-reduced-motion:reduce){.rocket-cloud-puff{display:none}.rocket-flame,.rocket-fin,.rocket-correction-jet{animation:none!important}.cursor-rocket:before,.cursor-rocket:after{animation:none!important}}

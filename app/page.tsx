@@ -105,6 +105,7 @@ function CustomCursor() {
       cursor.setAttribute("data-pressed", "false");
       cursor.setAttribute("data-engine-active", "false");
       cursor.setAttribute("data-adjusting", "false");
+      cursor.setAttribute("data-correction-phase", "none");
       root.classList.remove("has-custom-cursor");
       initialized = false;
       wasMoving = false;
@@ -124,11 +125,12 @@ function CustomCursor() {
       else if (wasMoving) { wasMoving = false; idleSince = now; pointerSpeed = 0; movementStartedAt = 0; }
       const settleTime = idleSince ? now - idleSince : 1000;
       const upright = 0;
-      const adjusting = !reducedMotion && idleSince > 0 && settleTime < 500;
+      const adjusting = !reducedMotion && idleSince > 0 && settleTime < 820;
+      const correctionPhase = !adjusting ? "none" : settleTime < 280 ? "right" : settleTime < 540 ? "left" : "settle";
       const targetAngle = pointerMoving && pointerSpeed > 0.4
         ? pointerAngle + Math.PI / 2
-        : reducedMotion ? upright : settleTime < 180 ? upright + 0.22 : settleTime < 360 ? upright - 0.11 : upright;
-      const horizontalCorrection = reducedMotion ? 0 : settleTime < 180 ? 9 : settleTime < 360 ? -4 : 0;
+        : reducedMotion ? upright : correctionPhase === "right" ? upright + 0.2 : correctionPhase === "left" ? upright - 0.09 : upright;
+      const horizontalCorrection = reducedMotion ? 0 : correctionPhase === "right" ? 8 : correctionPhase === "left" ? -3 : 0;
       const targetX = position.x + horizontalCorrection;
       const targetY = position.y + 21;
       const distanceX = targetX - rocketPosition.x;
@@ -153,13 +155,14 @@ function CustomCursor() {
       }
       cursor.setAttribute("data-adjusting", adjusting ? "true" : "false");
       cursor.setAttribute("data-engine-active", engineActive ? "true" : "false");
+      cursor.setAttribute("data-correction-phase", correctionPhase);
       rocket.style.transform = `translate3d(${rocketPosition.x - 12}px, ${rocketPosition.y - 12}px, 0) rotate(${rocketPosition.angle}rad)`;
 
       const tailX = -Math.sin(rocketPosition.angle);
       const tailY = Math.cos(rocketPosition.angle);
       const engineX = rocketPosition.x + tailX * 14;
       const engineY = rocketPosition.y + tailY * 14;
-      const cloudTargetOpacity = engineActive ? 0.72 : adjusting ? 0.3 : 0;
+      const cloudTargetOpacity = engineActive ? 0.74 : correctionPhase === "right" ? 0.82 : correctionPhase === "left" ? 0.7 : correctionPhase === "settle" ? 0.42 : 0;
       let cloudStillMoving = false;
       let followX = engineX;
       let followY = engineY;
@@ -225,6 +228,7 @@ function CustomCursor() {
       cursor.setAttribute("data-visible", "true");
       cursor.setAttribute("data-hover", element?.closest("a, button, [role='button']") ? "true" : "false");
       cursor.setAttribute("data-adjusting", "false");
+      cursor.setAttribute("data-correction-phase", "none");
       star.style.transform = `translate3d(${position.x - 3}px, ${position.y - 3}px, 0)`;
 
       if (!frame) frame = requestAnimationFrame(tick);
@@ -262,7 +266,7 @@ function CustomCursor() {
     };
   }, []);
 
-  return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-hover="false" data-pressed="false" data-adjusting="false" data-engine-active="false">
+  return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-hover="false" data-pressed="false" data-adjusting="false" data-engine-active="false" data-correction-phase="none">
     {[0, 1, 2, 3, 4].map((index) => <span className="rocket-cloud-puff" key={index} ref={(node) => { cloudRefs.current[index] = node; }} />)}
     <span className="cursor-star" ref={starRef}><svg viewBox="0 0 12 12"><path d="M6 0.5 7.35 4.65 11.5 6 7.35 7.35 6 11.5 4.65 7.35.5 6 4.65 4.65 6 .5Z" /></svg></span>
     <span className="cursor-rocket" ref={rocketRef}><svg viewBox="0 0 28 28"><path className="rocket-fin" d="M9 13.5 4.5 20.5 9 19.3ZM19 13.5l4.5 7-4.5-1.2Z"/><path className="rocket-correction-jet" d="M8.8 15.5 6.3 18.5l2.6-.8Zm10.4 0 2.5 3-2.6-.8Z"/><path className="rocket-body" d="M14 2C10 5.6 8.5 10.5 8.5 17v2h11v-2C19.5 10.5 18 5.6 14 2Z"/><circle className="rocket-window" cx="14" cy="10.5" r="2.1"/><path className="rocket-flame" d="M11 19 14 26 17 19Z"/></svg></span>
