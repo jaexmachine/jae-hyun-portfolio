@@ -152,6 +152,7 @@ html[data-theme="light"] .rocket-cloud-puff{background:radial-gradient(ellipse,r
   --display:var(--sans);
   --action:var(--coral);
   --action-hover:var(--coral-hover);
+  --action-text:#ff9a82;
   --action-rgb:var(--coral-rgb);
   color-scheme:dark;
 }
@@ -172,6 +173,7 @@ html[data-theme="light"]{
   --blue:#32465e;
   --action:#e66b56;
   --action-hover:#e76f59;
+  --action-text:#ad4436;
   --action-rgb:230,107,86;
 }
 html,body{font-size:15px}
@@ -274,6 +276,12 @@ html[data-theme="light"] .about-note .note-icon{color:var(--italic-ink);border-c
 html[data-theme="light"] .about-note small{color:#65758b}
 html[data-theme="light"] .about-note p{color:#172842}
 html[data-theme="light"] .about-note .note-number{color:#65758b}
+.availability{color:var(--action-text)}
+.availability i{background:var(--action-text);box-shadow:0 0 9px rgba(var(--action-rgb),.58)}
+.contact-pill{color:var(--action-text);background:rgba(var(--action-rgb),.07);border-color:rgba(var(--action-rgb),.58)}
+.contact-pill:hover{background:var(--action);border-color:var(--action);color:#172842}
+.status-chip{color:var(--action-text);background:rgba(var(--action-rgb),.08);border-color:rgba(var(--action-rgb),.48)}
+.status-chip i{background:var(--action-text);box-shadow:0 0 9px rgba(var(--action-rgb),.5)}
 @media(max-width:680px){
   .topbar{height:65px;padding:0 16px}
   .top-actions{gap:8px}
