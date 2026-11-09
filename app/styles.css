@@ -306,3 +306,15 @@ html[data-theme="light"] .about-note .note-number{color:#65758b}
   .cert-row>div span{font-size:10px}
   .skills-cloud span{font-size:10px}
 }
+
+/* Clear keyboard focus and comfortable tap targets across input modes. */
+a:focus-visible,button:focus-visible{outline:2px solid var(--action-text);outline-offset:3px}
+.theme-toggle:focus-visible,.mobile-menu-toggle:focus-visible,.see-more-button:focus-visible{outline-color:var(--action-text)}
+@media(max-width:680px){
+  .theme-toggle,
+  .mobile-menu-toggle{width:44px;height:44px}
+}
+@media(max-width:420px){
+  .hero-buttons{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+  .hero-buttons>.button{width:100%;min-height:48px;justify-content:space-between}
+}
