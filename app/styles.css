@@ -133,15 +133,18 @@ html[data-theme="light"] .rocket-cloud-puff{background:radial-gradient(ellipse,r
 /* Navy, cream and coral system with a more readable type scale. */
 :root{
   --cream:#f4ead6;
+  --cream-bright:#fff7e9;
+  --cream-accent:#ddc9a5;
   --coral:#f07863;
   --coral-hover:#ffb3a2;
   --coral-rgb:240,120,99;
   --bg:#08172d;
   --panel:#10223a;
   --panel-2:#1a2d46;
-  --ink:var(--cream);
-  --muted:#d6cbb8;
-  --dim:#b2a58f;
+  --ink:var(--cream-bright);
+  --muted:#bdc8d6;
+  --dim:#a4b0c0;
+  --italic-ink:var(--cream-accent);
   --line:rgba(244,234,214,.16);
   --mint:#e8ddc7;
   --lav:#d8cdb9;
@@ -155,12 +158,15 @@ html[data-theme="light"] .rocket-cloud-puff{background:radial-gradient(ellipse,r
 }
 html[data-theme="light"]{
   --cream:#f4eedf;
+  --cream-bright:#172842;
+  --cream-accent:#715d43;
   --bg:#f4eedf;
   --panel:#fffaf0;
   --panel-2:#ebe2d1;
   --ink:#172842;
   --muted:#4b5a70;
   --dim:#68675f;
+  --italic-ink:#715d43;
   --line:rgba(23,40,66,.16);
   --mint:#32465e;
   --lav:#46566b;
@@ -196,8 +202,8 @@ html[data-theme="light"] .brand-logo{filter:brightness(0) saturate(100%) invert(
 .scene-tag{font-size:10px}
 .scene-tag>span:first-child{font-size:10px}
 .eyebrow{font-size:10px}
-.hero-copy h1,.section-heading h2,.projects-heading h2,.about-left h2,.journey-heading h2,.contact-inner h2{letter-spacing:-.045em}
-.serif-italic{letter-spacing:-.035em}
+.hero-copy h1,.section-heading h2,.projects-heading h2,.about-left h2,.journey-heading h2,.contact-inner h2{letter-spacing:-.045em;color:var(--ink)}
+.serif-italic{letter-spacing:-.035em;color:var(--italic-ink)}
 .hero-description,.section-intro,.projects-heading>p,.journey-heading>p,.research-detail>p,.project-info>p,.about-left>p,.about-note p,.skills-panel p,.timeline-content>p,.award-card p,.contact-inner>p,.details-grid p{font-size:15px;line-height:1.7;color:var(--muted)}
 .research-topline{font-size:10px}
 .research-meta{font-size:9px}
@@ -242,6 +248,32 @@ html[data-theme="light"] .live-indicator{color:var(--action)}
 html[data-theme="light"] .contact-section{background:radial-gradient(ellipse at 50% 65%,rgba(23,40,66,.06),transparent 45%),#eee7d9}
 html[data-theme="light"] .skip-build{background:rgba(255,250,240,.94);border-color:var(--line);color:var(--ink)}
 html[data-theme="light"] .toast{background:var(--panel);color:var(--ink);border-color:var(--line)}
+
+/* Give the About cards a distinctly navy surface and a warm, readable type ladder. */
+.about-note{
+  background:linear-gradient(112deg,#10223b 0%,#132943 58%,#182d49 100%);
+  border-color:rgba(175,195,220,.2);
+  box-shadow:inset 3px 0 0 rgba(221,201,165,.72),0 12px 26px rgba(1,9,22,.12);
+}
+.about-note:nth-child(2){background:linear-gradient(112deg,#122641 0%,#172d49 58%,#1b324f 100%)}
+.about-note:nth-child(3){background:linear-gradient(112deg,#0e2038 0%,#142944 58%,#192d49 100%)}
+.about-note:hover{border-color:rgba(221,201,165,.58);box-shadow:inset 3px 0 0 var(--cream-accent),0 16px 32px rgba(1,9,22,.2)}
+.about-note .note-icon{color:var(--cream-accent);border-color:rgba(221,201,165,.38)}
+.about-note small{color:#a9b8ca;font-size:9px}
+.about-note p{color:#f0e5d1;font-size:16px;font-weight:500;line-height:1.45;letter-spacing:-.015em}
+.about-note .note-number{color:#99a9bc;font-size:9px}
+html[data-theme="light"] .about-note,
+html[data-theme="light"] .about-note:nth-child(2),
+html[data-theme="light"] .about-note:nth-child(3){
+  background:linear-gradient(112deg,#fffaf0 0%,#f1eadb 62%,#e7e4de 100%);
+  border-color:rgba(23,40,66,.18);
+  box-shadow:inset 3px 0 0 #b79d76,0 10px 24px rgba(23,40,66,.06);
+}
+html[data-theme="light"] .about-note:hover{border-color:rgba(113,93,67,.45);box-shadow:inset 3px 0 0 #715d43,0 14px 30px rgba(23,40,66,.1)}
+html[data-theme="light"] .about-note .note-icon{color:#715d43;border-color:rgba(113,93,67,.34)}
+html[data-theme="light"] .about-note small{color:#65758b}
+html[data-theme="light"] .about-note p{color:#172842}
+html[data-theme="light"] .about-note .note-number{color:#65758b}
 @media(max-width:680px){
   .topbar{height:65px;padding:0 16px}
   .top-actions{gap:8px}
