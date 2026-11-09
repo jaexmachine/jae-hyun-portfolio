@@ -175,6 +175,11 @@ html[data-theme="light"]{
   --action-hover:#e76f59;
   --action-text:#ad4436;
   --action-rgb:230,107,86;
+  --visual-surface:#e9e4d8;
+  --visual-panel:#fffaf0;
+  --visual-ink:#324761;
+  --visual-line:rgba(23,40,66,.26);
+  --visual-grid:rgba(23,40,66,.075);
 }
 html,body{font-size:15px}
 ::selection{background:rgba(var(--action-rgb),.3);color:var(--ink)}
@@ -318,3 +323,82 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--action-text);outlin
   .hero-buttons{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
   .hero-buttons>.button{width:100%;min-height:48px;justify-content:space-between}
 }
+
+/* Repaint the CSS illustrations as warm, navy-line artwork in light mode. */
+html[data-theme="light"] .profile-card{
+  background:var(--visual-panel);
+  border-color:var(--line);
+  box-shadow:0 24px 60px rgba(23,40,66,.12);
+}
+html[data-theme="light"] .profile-card:hover{box-shadow:0 30px 72px rgba(23,40,66,.16)}
+html[data-theme="light"] .profile-card-top,
+html[data-theme="light"] .profile-card-bottom,
+html[data-theme="light"] .profile-card-bottom div>span{color:var(--muted)}
+html[data-theme="light"] .profile-card-bottom strong{color:var(--ink)}
+html[data-theme="light"] .portrait-abstract{
+  background:linear-gradient(150deg,#dbe5eb 0%,#d4dfe5 55%,#c2d1dc 100%);
+}
+html[data-theme="light"] .portrait-abstract:before{
+  background:linear-gradient(120deg,transparent 20%,rgba(255,250,240,.45),transparent 57%);
+}
+html[data-theme="light"] .portrait-sun{background:#fff8e9;box-shadow:0 0 55px rgba(255,248,233,.65)}
+html[data-theme="light"] .hill-one{background:#9dafc1}
+html[data-theme="light"] .hill-two{background:#7188a1}
+html[data-theme="light"] .portrait-stem{color:#172842}
+html[data-theme="light"] .portrait-caption{color:#324761}
+html[data-theme="light"] .art-orbit{border-color:rgba(23,40,66,.18)}
+html[data-theme="light"] .orbit-inner{border-color:rgba(23,40,66,.12)}
+html[data-theme="light"] .art-chip{
+  background:var(--visual-panel);
+  border-color:var(--line);
+  color:var(--visual-ink);
+  box-shadow:0 8px 20px rgba(23,40,66,.08);
+}
+html[data-theme="light"] .coordinates,
+html[data-theme="light"] .hero-side-note{color:#65758b}
+
+html[data-theme="light"] .research-card{
+  background:var(--visual-panel);
+  border-color:var(--line);
+  box-shadow:0 18px 42px rgba(23,40,66,.08);
+}
+html[data-theme="light"] .research-visual,
+html[data-theme="light"] .project-visual,
+html[data-theme="light"] .accent-blue .project-visual,
+html[data-theme="light"] .accent-peach .project-visual{
+  background:var(--visual-surface);
+}
+html[data-theme="light"] .map-grid,
+html[data-theme="light"] .project-visual-grid{
+  background-image:linear-gradient(var(--visual-grid) 1px,transparent 1px),linear-gradient(90deg,var(--visual-grid) 1px,transparent 1px);
+}
+html[data-theme="light"] .map-ring{border-color:var(--visual-line)}
+html[data-theme="light"] .ring-two{border-color:rgba(23,40,66,.2)}
+html[data-theme="light"] .ring-three{border-color:rgba(23,40,66,.14)}
+html[data-theme="light"] .map-line{background:linear-gradient(90deg,transparent,rgba(23,40,66,.34),transparent)}
+html[data-theme="light"] .map-hotspot{border-color:var(--action-text);box-shadow:0 0 18px rgba(var(--action-rgb),.28)}
+html[data-theme="light"] .map-hotspot:before,
+html[data-theme="light"] .map-hotspot:after{border-color:rgba(50,71,97,.28)}
+html[data-theme="light"] .map-hotspot i,
+html[data-theme="light"] .map-legend i{background:var(--action)}
+html[data-theme="light"] .map-label,
+html[data-theme="light"] .map-label.label-two,
+html[data-theme="light"] .map-legend,
+html[data-theme="light"] .map-axis{color:var(--visual-ink)}
+html[data-theme="light"] .research-topline,
+html[data-theme="light"] .research-meta{color:var(--muted)}
+html[data-theme="light"] .research-detail h3{color:var(--ink)}
+html[data-theme="light"] .research-detail h3 em{color:var(--italic-ink)}
+html[data-theme="light"] .research-detail>p,
+html[data-theme="light"] .research-detail .details-grid p,
+html[data-theme="light"] .research-detail .details-footnote{color:var(--muted)}
+html[data-theme="light"] .research-detail .tag-list span{color:var(--visual-ink);border-color:var(--line)}
+html[data-theme="light"] .research-detail .see-more-button{color:var(--visual-ink);border-color:var(--line)}
+html[data-theme="light"] .project-graphic span,
+html[data-theme="light"] .graphic-03 span,
+html[data-theme="light"] .graphic-03 span:nth-child(2),
+html[data-theme="light"] .graphic-03 span:nth-child(3){border-color:var(--visual-line)}
+html[data-theme="light"] .project-graphic i,
+html[data-theme="light"] .graphic-03 i{background:var(--visual-ink);box-shadow:0 0 18px rgba(50,71,97,.2)}
+html[data-theme="light"] .visual-code,
+html[data-theme="light"] .visual-serial{color:var(--visual-ink)}
