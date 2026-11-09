@@ -386,6 +386,7 @@ export default function Home() {
   const [toast, setToast] = useState("");
   const [activeNav, setActiveNav] = useState("research");
   const [navHidden, setNavHidden] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
@@ -403,9 +404,11 @@ export default function Home() {
       const y = window.scrollY;
       if (y < 100) {
         setNavHidden(false);
+        setMobileMenuOpen(false);
         lastToggleY = y;
       } else if (y > lastToggleY + 18) {
         setNavHidden(true);
+        setMobileMenuOpen(false);
         lastToggleY = y;
       } else if (y < lastToggleY - 18) {
         setNavHidden(false);
@@ -416,6 +419,15 @@ export default function Home() {
     window.addEventListener("scroll", updateNav, { passive: true });
     return () => window.removeEventListener("scroll", updateNav);
   }, []);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [mobileMenuOpen]);
 
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
@@ -466,12 +478,14 @@ export default function Home() {
           const headline = scene.querySelector<HTMLElement>("h1");
           const art = scene.querySelector<HTMLElement>(".hero-art");
           const profileTag = scene.querySelector<HTMLElement>(".hero-copy .scene-tag");
+          const heroEssentials = scene.querySelector<HTMLElement>(".hero-essentials");
           const sideNote = scene.querySelector<HTMLElement>(".hero-side-note");
           if (!headline || !art) return;
 
           const details = [
+            heroEssentials,
             profileTag,
-            ...items.filter((item) => item !== headline),
+            ...items.filter((item) => item !== headline && item !== heroEssentials),
             sideNote,
           ].filter((item): item is HTMLElement => item !== null);
           const headlineRect = headline.getBoundingClientRect();
@@ -500,16 +514,16 @@ export default function Home() {
           // Let the thought land first. Then move it into its editorial position
           // before rebuilding the supporting details around it.
           timeline.to(headline, { x: 0, y: 0, scale: 1, duration: 0.37, ease: "power3.inOut" }, 0)
-            .set(headline, { textAlign: "left" }, 0.37)
-            .to(art, { autoAlpha: 1, visibility: "visible", duration: 0.08 }, 0.39);
+            .set(headline, { textAlign: "left" }, 0.37);
 
-          const buildStart = 0.44;
-          const buildEnd = 0.86;
+          const buildStart = 0.40;
+          const buildEnd = 0.87;
           const step = (buildEnd - buildStart) / Math.max(details.length, 1);
+          timeline.to(art, { autoAlpha: 1, visibility: "visible", duration: 0.08 }, buildStart + step * 1.6);
           details.forEach((item, i) => {
             const startAt = buildStart + i * step;
             const next = details[i + 1];
-            timeline.to(frame, { ...boxProps(item), autoAlpha: 0.96, scale: 1, borderColor: i % 2 ? "#c2b7ff" : "#83b6ff", duration: step * 0.58 }, startAt);
+            timeline.to(frame, { ...boxProps(item), autoAlpha: 0.96, scale: 1, borderColor: i % 2 ? "#d8cdb9" : "#e8ddc7", duration: step * 0.58 }, startAt);
             if (cursors[0]) timeline.to(cursors[0], { ...pointProps(item), autoAlpha: 1, duration: step * 0.55 }, startAt);
             if (cursors[1] && next) timeline.to(cursors[1], { ...pointProps(next), autoAlpha: 0.84, duration: step * 0.68 }, startAt + step * 0.12);
             timeline.to(item, { autoAlpha: 1, visibility: "visible", duration: step * 0.3, ease: "power1.out" }, startAt + step * 0.62);
@@ -541,7 +555,7 @@ export default function Home() {
         items.forEach((item, i) => {
           const startAt = buildStart + i * step;
           const next = items[i + 1];
-          const color = i % 2 ? "#c2b7ff" : "#83b6ff";
+          const color = i % 2 ? "#d8cdb9" : "#e8ddc7";
 
           // The frame glides from element to element, then lands on its exact DOM bounds.
           timeline.to(frame, { ...boxProps(item), autoAlpha: 0.96, scale: 1, borderColor: color, duration: step * 0.58 }, startAt);
@@ -590,18 +604,25 @@ export default function Home() {
     <div className="ambient-orb orb-a" /><div className="ambient-orb orb-b" />
     <header className={`topbar${navHidden ? " is-hidden" : ""}`}>
       <a className="brand" href="#home" aria-label="Jae Hyun home"><span className="brand-mark"><Image className="brand-logo brand-logo-light" src="/rocket-j-light.png" alt="" width={1280} height={1280} /><Image className="brand-logo brand-logo-dark" src="/rocket-j-dark.png" alt="" width={1280} height={1280} priority /></span><span className="brand-name">jae hyun<br /><small>PORTFOLIO / 2026</small></span></a>
-      <nav className="flex items-center gap-2 sm:gap-3 md:gap-8" aria-label="Main navigation"><a className={activeNav === "research" ? "is-active" : ""} aria-current={activeNav === "research" ? "location" : undefined} href="#research" onClick={() => setActiveNav("research")}>Work</a><a className={activeNav === "about" ? "is-active" : ""} aria-current={activeNav === "about" ? "location" : undefined} href="#about" onClick={() => setActiveNav("about")}>About</a><a className={activeNav === "experience" ? "is-active" : ""} aria-current={activeNav === "experience" ? "location" : undefined} href="#experience" onClick={() => setActiveNav("experience")}>Journey</a><a className={activeNav === "contact" ? "is-active" : ""} aria-current={activeNav === "contact" ? "location" : undefined} href="#contact" onClick={() => setActiveNav("contact")}>Contact</a></nav>
-      <div className="top-actions"><span className="availability"><i /> OPEN TO OPPORTUNITIES</span><button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} aria-pressed={theme === "light"} title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}><span aria-hidden="true">{theme === "dark" ? "☼" : "☾"}</span></button><a className="contact-pill" href="#contact">Let’s talk <Arrow diagonal /></a></div>
+      <nav id="portfolio-navigation" className={`site-nav flex items-center gap-2 sm:gap-3 md:gap-8${mobileMenuOpen ? " is-open" : ""}`} aria-label="Main navigation">
+        <a className={activeNav === "research" ? "is-active" : ""} aria-current={activeNav === "research" ? "location" : undefined} href="#research" onClick={() => { setActiveNav("research"); setMobileMenuOpen(false); }}>Work</a>
+        <a className={activeNav === "about" ? "is-active" : ""} aria-current={activeNav === "about" ? "location" : undefined} href="#about" onClick={() => { setActiveNav("about"); setMobileMenuOpen(false); }}>About</a>
+        <a className={activeNav === "experience" ? "is-active" : ""} aria-current={activeNav === "experience" ? "location" : undefined} href="#experience" onClick={() => { setActiveNav("experience"); setMobileMenuOpen(false); }}>Journey</a>
+        <a className={activeNav === "contact" ? "is-active" : ""} aria-current={activeNav === "contact" ? "location" : undefined} href="#contact" onClick={() => { setActiveNav("contact"); setMobileMenuOpen(false); }}>Contact</a>
+      </nav>
+      <div className="top-actions"><span className="availability"><i /> OPEN TO OPPORTUNITIES</span><button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} aria-pressed={theme === "light"} title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}><span aria-hidden="true">{theme === "dark" ? "☼" : "☾"}</span></button><button className={`mobile-menu-toggle${mobileMenuOpen ? " is-open" : ""}`} type="button" aria-controls="portfolio-navigation" aria-expanded={mobileMenuOpen} aria-label={mobileMenuOpen ? "Close navigation" : "Open navigation"} onClick={() => setMobileMenuOpen((open) => !open)}><span/><span/></button><a className="contact-pill" href="#contact">Let’s talk <Arrow diagonal /></a></div>
     </header>
 
     <Scene id="home" className="hero-scene">
       <div className="hero-grid">
         <div className="hero-copy">
           <SceneTag n="01">PERSONAL PROFILE</SceneTag>
-          <p className="eyebrow" data-build-item>COMPUTER SCIENCE · AI SPECIALIZATION</p>
           <h1 data-build-item>Making sense<br />of <span className="serif-italic">what’s next.</span></h1>
-          <p className="hero-description" data-build-item>I’m Jae Hyun Tukushima, an AI and data analyst who turns complex systems into clear tools, useful insights, and ideas people can act on.</p>
-          <div className="hero-buttons" data-build-item><a className="button button-primary" href="#research">Explore my work <Arrow /></a><a className="button button-quiet" href="#about">A little about me <span>↘</span></a></div>
+          <div className="hero-essentials" data-build-item>
+            <p className="eyebrow">COMPUTER SCIENCE · AI SPECIALIZATION</p>
+            <p className="hero-description">I’m Jae Hyun Tukushima, an AI and data analyst who turns complex systems into clear tools, useful insights, and ideas people can act on.</p>
+            <div className="hero-buttons"><a className="button button-primary" href="#research">Explore my work <Arrow /></a><a className="button button-quiet" href="#about">A little about me <span>↘</span></a></div>
+          </div>
           <div className="hero-footnote" data-build-item><span>SCROLL TO WATCH IT COME TOGETHER</span><span className="scroll-line" /></div>
         </div>
         <div className="hero-art" aria-label="Portfolio being assembled in a design workspace">
@@ -616,7 +637,7 @@ export default function Home() {
           <div className="coordinates">14°35’58.2”N<br/>120°59’02.5”E</div>
         </div>
       </div>
-      <div className="hero-side-note">SCROLL / BUILD SEQUENCE&nbsp;&nbsp; ↓</div>
+      <div className="hero-side-note">SCROLL - BUILD SEQUENCE&nbsp;&nbsp; ↓</div>
     </Scene>
 
     <div className="ticker" aria-label="Areas of interest"><div className="ticker-track"><span>ARTIFICIAL INTELLIGENCE</span><b>✳</b><span>DATA ANALYTICS</span><b>✳</b><span>GEOAI & SPATIAL SYSTEMS</span><b>✳</b><span>INTELLIGENT AUTOMATION</span><b>✳</b><span>ARTIFICIAL INTELLIGENCE</span><b>✳</b><span>DATA ANALYTICS</span><b>✳</b><span>GEOAI & SPATIAL SYSTEMS</span><b>✳</b><span>INTELLIGENT AUTOMATION</span><b>✳</b></div></div>
