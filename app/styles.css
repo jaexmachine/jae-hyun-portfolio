@@ -282,6 +282,8 @@ html[data-theme="light"] .about-note .note-number{color:#65758b}
 .contact-pill:hover{background:var(--action);border-color:var(--action);color:#172842}
 .status-chip{color:var(--action-text);background:rgba(var(--action-rgb),.08);border-color:rgba(var(--action-rgb),.48)}
 .status-chip i{background:var(--action-text);box-shadow:0 0 9px rgba(var(--action-rgb),.5)}
+.edit-selection{border-color:var(--action);box-shadow:0 0 18px rgba(var(--action-rgb),.2)}
+.edit-selection i,.edit-selection b{border-color:var(--action)}
 @media(max-width:680px){
   .topbar{height:65px;padding:0 16px}
   .top-actions{gap:8px}
