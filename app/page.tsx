@@ -620,7 +620,7 @@ export default function Home() {
           <h1 data-build-item>Making sense<br />of <span className="hero-emphasis">what’s next.</span></h1>
           <div className="hero-essentials" data-build-item>
             <p className="eyebrow">COMPUTER SCIENCE · AI SPECIALIZATION</p>
-            <p className="hero-description">I’m Jae Hyun Tukushima, an AI and data analyst who turns complex systems into clear tools, useful insights, and ideas people can act on.</p>
+            <p className="hero-description">I turn complex data into clear tools and insights people can act on.</p>
             <div className="hero-buttons"><a className="button button-primary" href="#research">Explore my work <Arrow /></a><a className="button button-quiet" href="#about">A little about me <span>↘</span></a></div>
           </div>
           <div className="hero-footnote" data-build-item><span>SCROLL TO WATCH IT COME TOGETHER</span><span className="scroll-line" /></div>
@@ -665,7 +665,7 @@ export default function Home() {
     </section>
 
     <Scene id="about" className="about-scene">
-      <div className="section-wrap about-layout"><div className="about-left"><SceneTag n="04">A LITTLE CONTEXT</SceneTag><h2 data-build-item>Curious about<br />systems. <span className="serif-italic">Grounded<br />in people.</span></h2><p data-build-item>I’m studying Computer Science, specializing in AI, at FEU Institute of Technology. I enjoy turning technical ideas into tools, workshops, and insights people can use.</p><a className="text-link" href="https://www.linkedin.com/in/jae-hyun-tukushima/" target="_blank" rel="noreferrer" data-build-item>More on LinkedIn <Arrow diagonal /></a></div><div className="about-right">
+      <div className="section-wrap about-layout"><div className="about-left"><SceneTag n="04">A LITTLE CONTEXT</SceneTag><h2 data-build-item>Curious about<br />systems. <span className="serif-italic">Grounded<br />in people.</span></h2><p data-build-item>I enjoy creating spaces where people can try new tools, ask better questions, and learn by building.</p><a className="text-link" href="https://www.linkedin.com/in/jae-hyun-tukushima/" target="_blank" rel="noreferrer" data-build-item>More on LinkedIn <Arrow diagonal /></a></div><div className="about-right">
         <div className="about-note note-one" data-build-item><span className="note-icon">↗</span><div><small>THINK IN SYSTEMS</small><p>From spatial signals to a well-shaped dataset.</p></div><span className="note-number">01</span></div>
         <div className="about-note note-two" data-build-item><span className="note-icon">✳</span><div><small>BUILD FOR PEOPLE</small><p>Clear tools. Shared knowledge. Better decisions.</p></div><span className="note-number">02</span></div>
         <div className="about-note note-three" data-build-item><span className="note-icon">⌁</span><div><small>STAY CURIOUS</small><p>Always learning, always asking one more question.</p></div><span className="note-number">03</span></div>
