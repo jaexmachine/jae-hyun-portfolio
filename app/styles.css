@@ -208,6 +208,7 @@ html[data-theme="light"] .brand-logo{filter:brightness(0) saturate(100%) invert(
 .scene-tag>span:first-child{font-size:10px}
 .eyebrow{font-size:10px}
 .hero-copy h1,.section-heading h2,.projects-heading h2,.about-left h2,.journey-heading h2,.contact-inner h2{letter-spacing:-.045em;color:var(--ink)}
+.hero-emphasis{font:700 .88em/.95 var(--sans);letter-spacing:-.06em;color:var(--coral);font-style:normal;white-space:nowrap}
 .serif-italic{letter-spacing:-.035em;color:var(--italic-ink)}
 .hero-description,.section-intro,.projects-heading>p,.journey-heading>p,.research-detail>p,.project-info>p,.about-left>p,.about-note p,.skills-panel p,.timeline-content>p,.award-card p,.contact-inner>p,.details-grid p{font-size:15px;line-height:1.7;color:var(--muted)}
 .research-topline{font-size:10px}

@@ -617,7 +617,7 @@ export default function Home() {
       <div className="hero-grid">
         <div className="hero-copy">
           <SceneTag n="01">PERSONAL PROFILE</SceneTag>
-          <h1 data-build-item>Making sense<br />of <span className="serif-italic">what’s next.</span></h1>
+          <h1 data-build-item>Making sense<br />of <span className="hero-emphasis">what’s next.</span></h1>
           <div className="hero-essentials" data-build-item>
             <p className="eyebrow">COMPUTER SCIENCE · AI SPECIALIZATION</p>
             <p className="hero-description">I’m Jae Hyun Tukushima, an AI and data analyst who turns complex systems into clear tools, useful insights, and ideas people can act on.</p>
