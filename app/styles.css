@@ -124,6 +124,11 @@ html.has-custom-cursor,html.has-custom-cursor *{cursor:none!important}
 html[data-theme="light"] .rocket-cloud-puff{background:radial-gradient(ellipse,rgba(255,255,255,.98) 0%,rgba(238,226,207,.55) 48%,rgba(20,38,63,.12) 78%,transparent 100%)}
 .custom-cursor[data-engine-active="true"] .rocket-flame{animation:rocket-burn .14s ease-in-out infinite alternate;filter:brightness(1.6)}
 .custom-cursor[data-engine-active="true"] .cursor-rocket:after{opacity:.82;animation:rocket-plume .16s ease-in-out infinite alternate}
+.custom-cursor[data-scrolling="true"] .cursor-rocket{filter:drop-shadow(0 0 9px rgba(var(--action-rgb),.58))}
+.custom-cursor[data-scrolling="true"] .cursor-rocket:before{opacity:1;background:radial-gradient(circle,rgba(var(--action-rgb),.4),rgba(var(--action-rgb),.1) 44%,transparent 74%);animation:rocket-correction-glow .3s ease-in-out infinite alternate}
+.custom-cursor[data-scrolling="true"] .cursor-rocket:after{opacity:1;background:linear-gradient(var(--action),transparent);filter:blur(2px);animation:rocket-plume .12s ease-in-out infinite alternate}
+.custom-cursor[data-scrolling="true"] .rocket-flame{fill:var(--action);animation:rocket-burn .11s ease-in-out infinite alternate;filter:brightness(1.5) drop-shadow(0 0 5px rgba(var(--action-rgb),.8))}
+.custom-cursor[data-scrolling="true"] .rocket-cloud-puff{background:radial-gradient(ellipse,rgba(var(--action-rgb),.72) 0%,rgba(var(--action-rgb),.42) 48%,rgba(var(--action-rgb),.08) 78%,transparent 100%);filter:blur(1.5px)}
 @keyframes rocket-burn{from{transform:scale(.78)}to{transform:scale(1.13)}}
 @keyframes rocket-gimbal{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
 @keyframes rocket-correction-glow{from{transform:scale(.62);opacity:.5}to{transform:scale(1.08);opacity:1}}

@@ -103,6 +103,9 @@ function CustomCursor() {
     let cloudEmissionAt = 0;
     let emittedCloudCount = 0;
     let previousFrameAt = 0;
+    let scrollDirection: "up" | "down" = "up";
+    let scrollUntil = 0;
+    let lastScrollY = window.scrollY;
 
     const hideCursor = () => {
       active = false;
@@ -114,6 +117,7 @@ function CustomCursor() {
       cursor.setAttribute("data-engine-active", "false");
       cursor.setAttribute("data-adjusting", "false");
       cursor.setAttribute("data-correction-phase", "none");
+      cursor.setAttribute("data-scrolling", "false");
       root.classList.remove("has-custom-cursor");
       initialized = false;
       wasMoving = false;
@@ -166,6 +170,7 @@ function CustomCursor() {
       const now = performance.now();
       const delta = previousFrameAt ? Math.min((now - previousFrameAt) / 1000, 0.06) : 1 / 60;
       previousFrameAt = now;
+      const scrollBoosting = !reducedMotion && now < scrollUntil;
       const pointerMoving = now - lastMoveAt < 200;
       const engineActive = pointerMoving && movementStartedAt > 0 && now - movementStartedAt >= 175;
       if (pointerMoving && pointerSpeed > 0.4) wasMoving = true;
@@ -202,7 +207,9 @@ function CustomCursor() {
       const visualCorrectionPhase = horizontalDirection < 0
         ? correctionPhase === "right" ? "left" : correctionPhase === "left" ? "right" : correctionPhase
         : correctionPhase;
-      const targetAngle = !pointerPresent
+      const targetAngle = scrollBoosting
+        ? scrollDirection === "down" ? Math.PI : upright
+        : !pointerPresent
         ? upright + correctionAngle * horizontalDirection
         : pointerMoving || !underCursor ? Math.atan2(position.y - rocketPosition.y, position.x - rocketPosition.x) + Math.PI / 2 : upright;
       const horizontalCorrection = reducedMotion ? 0 : correctionOffset * horizontalDirection;
@@ -234,6 +241,8 @@ function CustomCursor() {
       cursor.setAttribute("data-adjusting", adjusting ? "true" : "false");
       cursor.setAttribute("data-engine-active", engineActive ? "true" : "false");
       cursor.setAttribute("data-correction-phase", visualCorrectionPhase);
+      cursor.setAttribute("data-scrolling", scrollBoosting ? "true" : "false");
+      cursor.setAttribute("data-scroll-direction", scrollDirection);
       rocket.style.transform = `translate3d(${rocketPosition.x - 12}px, ${rocketPosition.y - 12}px, 0) rotate(${rocketPosition.angle}rad)`;
 
       const tailX = -Math.sin(rocketPosition.angle);
@@ -241,7 +250,7 @@ function CustomCursor() {
       const engineX = rocketPosition.x + tailX * 14;
       const engineY = rocketPosition.y + tailY * 14;
       const correctionSide = visualCorrectionPhase === "right" ? 1 : visualCorrectionPhase === "left" ? -1 : 0;
-      const emissionPeriod = engineActive ? 68 : adjusting && correctionSide !== 0 ? 82 : 0;
+      const emissionPeriod = scrollBoosting ? 54 : engineActive ? 68 : adjusting && correctionSide !== 0 ? 82 : 0;
       if (!reducedMotion && emissionPeriod && now - cloudEmissionAt >= emissionPeriod) {
         const index = nextCloud;
         const particle = cloudParticles[index];
@@ -253,9 +262,9 @@ function CustomCursor() {
         particle.vx = tailX * 0.55 + sideX * correctionSide * 0.35 + jitter * 0.12;
         particle.vy = tailY * 0.55 + sideY * correctionSide * 0.35 + jitter * 0.08;
         particle.age = 0;
-        particle.life = correctionSide ? 0.72 : 0.82;
-        particle.size = 9 + (emittedCloudCount % 4) * 2;
-        particle.opacity = correctionSide ? 0.72 : 0.62;
+        particle.life = correctionSide ? 0.72 : scrollBoosting ? 0.62 : 0.82;
+        particle.size = scrollBoosting ? 12 + (emittedCloudCount % 3) * 2 : 9 + (emittedCloudCount % 4) * 2;
+        particle.opacity = scrollBoosting ? 0.82 : correctionSide ? 0.72 : 0.62;
         particle.active = true;
         clouds[index].style.width = `${particle.size}px`;
         clouds[index].style.height = `${particle.size * 0.72}px`;
@@ -288,8 +297,23 @@ function CustomCursor() {
 
       const rocketStillMoving = distance > 0.7 || Math.abs(angleDifference) > 0.02 || Math.abs(rocketPosition.angleVelocity) > 0.005;
       const waitingForIgnition = pointerMoving && !engineActive;
-      if (pointerMoving || cloudsAnimating || rocketStillMoving || adjusting || waitingForIgnition) frame = requestAnimationFrame(tick);
+      if (pointerMoving || scrollBoosting || cloudsAnimating || rocketStillMoving || adjusting || waitingForIgnition) frame = requestAnimationFrame(tick);
       else frame = 0;
+    };
+
+    const onScroll = () => {
+      const nextScrollY = window.scrollY;
+      const scrollDelta = nextScrollY - lastScrollY;
+      lastScrollY = nextScrollY;
+      if (Math.abs(scrollDelta) < 1) return;
+      scrollDirection = scrollDelta > 0 ? "down" : "up";
+      scrollUntil = performance.now() + 180;
+      cursor.setAttribute("data-scroll-direction", scrollDirection);
+      cursor.setAttribute("data-scrolling", reducedMotion ? "false" : "true");
+      if (cursor.getAttribute("data-visible") === "true") {
+        active = true;
+        if (!frame) frame = requestAnimationFrame(tick);
+      }
     };
 
     const onPointerMove = (event: PointerEvent) => {
@@ -353,6 +377,7 @@ function CustomCursor() {
 
     document.addEventListener("pointermove", onPointerMove, { passive: true });
     document.addEventListener("pointerdown", onPointerDown, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("pointerup", onPointerUp, { passive: true });
     window.addEventListener("pointercancel", onPointerUp, { passive: true });
     document.documentElement.addEventListener("pointerleave", onPointerLeave);
@@ -365,6 +390,7 @@ function CustomCursor() {
       root.classList.remove("has-custom-cursor");
       document.removeEventListener("pointermove", onPointerMove);
       document.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerUp);
       document.documentElement.removeEventListener("pointerleave", onPointerLeave);
@@ -373,7 +399,7 @@ function CustomCursor() {
     };
   }, []);
 
-  return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-pointer-present="false" data-hover="false" data-pressed="false" data-adjusting="false" data-engine-active="false" data-correction-phase="none">
+  return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-pointer-present="false" data-hover="false" data-pressed="false" data-adjusting="false" data-engine-active="false" data-scrolling="false" data-scroll-direction="up" data-correction-phase="none">
     {Array.from({ length: 14 }, (_, index) => <span className="rocket-cloud-puff" key={index} ref={(node) => { cloudRefs.current[index] = node; }} />)}
     <span className="cursor-star" ref={starRef}><svg viewBox="0 0 12 12"><path d="M6 0.5 7.35 4.65 11.5 6 7.35 7.35 6 11.5 4.65 7.35.5 6 4.65 4.65 6 .5Z" /></svg></span>
     <span className="cursor-rocket" ref={rocketRef}><svg viewBox="0 0 28 28"><path className="rocket-fin" d="M9 13.5 4.5 20.5 9 19.3ZM19 13.5l4.5 7-4.5-1.2Z"/><path className="rocket-correction-jet" d="M8.8 15.5 6.3 18.5l2.6-.8Zm10.4 0 2.5 3-2.6-.8Z"/><path className="rocket-body" d="M14 2C10 5.6 8.5 10.5 8.5 17v2h11v-2C19.5 10.5 18 5.6 14 2Z"/><circle className="rocket-window" cx="14" cy="10.5" r="2.1"/><path className="rocket-flame" d="M11 19 14 26 17 19Z"/></svg></span>
