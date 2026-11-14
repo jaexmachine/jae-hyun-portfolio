@@ -695,7 +695,6 @@ export default function Home() {
         <div className="about-note note-one" data-build-item><span className="note-icon">↗</span><div><small>THINK IN SYSTEMS</small><p>From spatial signals to a well-shaped dataset.</p></div><span className="note-number">01</span></div>
         <div className="about-note note-two" data-build-item><span className="note-icon">✳</span><div><small>BUILD FOR PEOPLE</small><p>Clear tools. Shared knowledge. Better decisions.</p></div><span className="note-number">02</span></div>
         <div className="about-note note-three" data-build-item><span className="note-icon">⌁</span><div><small>STAY CURIOUS</small><p>Always learning, always asking one more question.</p></div><span className="note-number">03</span></div>
-        <div className="about-stamp">LEARNING<br/>IN PUBLIC<br/><b>✳</b></div>
       </div><div className="skills-panel" data-build-item><div><span className="skills-label">TOOLS I REACH FOR</span><p>A practical toolkit for exploring, modeling, and sharing.</p></div><div className="skills-cloud">{skills.map((skill, i) => <span key={skill} style={{"--skill-index": i} as React.CSSProperties}>{skill}</span>)}</div></div></div>
     </Scene>
 
@@ -704,7 +703,7 @@ export default function Home() {
         <div className="timeline-list">
           <article className="timeline-item" data-build-item><div className="timeline-year">AUG 2025 — AUG 2026</div><div className="timeline-marker"><i/></div><div className="timeline-content"><div className="timeline-top"><span>FEU TECH ACM STUDENT CHAPTER</span><span>02 / LEADERSHIP</span></div><h3>Associate Director<br />for Academics</h3><p>I led review sessions, AI workshops, and prompt-engineering programs. I helped run FEU Tech Developers Week and a university hackathon, where I advised 40+ teams. I also secured DataCamp Donates access for 200+ members.</p><div className="timeline-tags"><span>ACADEMIC PROGRAMS</span><span>COMMUNITY</span><span>EVENT LEADERSHIP</span></div></div></article>
           <article className="timeline-item" data-build-item><div className="timeline-year">AUG 2024 — AUG 2025</div><div className="timeline-marker"><i/></div><div className="timeline-content"><div className="timeline-top"><span>FEU TECH ACM STUDENT CHAPTER</span><span>01 / LEADERSHIP</span></div><h3>Junior Officer<br />for Academics</h3><p>I organized peer-led review sessions and ran hands-on Data Science workshops for 40+ students using Google Colab.</p><div className="timeline-tags"><span>DATA SCIENCE</span><span>PEER LEARNING</span><span>GOOGLE COLAB</span></div></div></article>
-        </div><div className="education-strip" data-build-item><span>EDUCATION</span><strong>FEU Institute of Technology</strong><span>BS Computer Science · Artificial Intelligence</span><span>AUG 2024 — PRESENT</span></div>
+        </div><div className="education-strip" data-build-item><span>EDUCATION</span><strong>FEU Institute of Technology</strong><span className="education-degree">BS Computer Science · Artificial Intelligence</span><span className="education-date">AUG 2024 — PRESENT</span></div>
       </div>
     </Scene>
 
