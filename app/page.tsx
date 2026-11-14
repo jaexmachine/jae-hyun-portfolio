@@ -454,7 +454,7 @@ function GravityGrid() {
     const coarsePointer = window.matchMedia("(pointer: coarse)");
     if (!canvas || !main || !context || reduceMotion.matches || coarsePointer.matches) return;
 
-    const pointer = { x: 0, y: 0, targetX: 0, targetY: 0, present: false, pressed: false };
+    const pointer = { x: 0, y: 0, targetX: 0, targetY: 0, present: false, pressed: false, pressedAt: 0 };
     let width = 0;
     let height = 0;
     let radius = 0;
@@ -501,7 +501,7 @@ function GravityGrid() {
 
     const draw = () => {
       context.clearRect(0, 0, width, height);
-      const gridActive = pointer.present && !pointer.pressed;
+      const gridActive = pointer.present && (!pointer.pressed || radius > 0.5);
       const activeRadius = gridActive ? radius : 0;
       const activeDepth = gridActive ? depth : 0;
       context.beginPath();
@@ -523,7 +523,7 @@ function GravityGrid() {
       context.lineWidth = 1;
       context.stroke();
 
-      if (gridActive && radius > 0) {
+      if (gridActive && !pointer.pressed && radius > 0) {
         const glow = context.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, radius * 0.9);
         glow.addColorStop(0, glowColor);
         glow.addColorStop(1, "rgba(0,0,0,0)");
@@ -539,8 +539,10 @@ function GravityGrid() {
       pointer.x += (pointer.targetX - pointer.x) * 0.2;
       pointer.y += (pointer.targetY - pointer.y) * 0.2;
 
-      const targetRadius = pointer.present && !pointer.pressed ? 142 : 0;
-      const targetDepth = pointer.present && !pointer.pressed ? 14 : 0;
+      const hold = pointer.pressed ? Math.max(0, Math.min((now - pointer.pressedAt - 380) / 1150, 1)) : 0;
+      const lensReveal = hold * hold * (3 - 2 * hold);
+      const targetRadius = pointer.present ? pointer.pressed ? 88 * lensReveal : 142 : 0;
+      const targetDepth = pointer.present ? pointer.pressed ? 44 * lensReveal : 14 : 0;
       radius += (targetRadius - radius) * easing;
       depth += (targetDepth - depth) * easing;
       draw();
@@ -566,14 +568,17 @@ function GravityGrid() {
       pointer.x = event.clientX;
       pointer.y = event.clientY;
       pointer.pressed = true;
+      pointer.pressedAt = performance.now();
       schedule();
     };
     const release = () => {
       pointer.pressed = false;
+      pointer.pressedAt = 0;
       schedule();
     };
     const leave = () => {
       pointer.pressed = false;
+      pointer.pressedAt = 0;
       pointer.present = false;
       schedule();
     };
@@ -582,6 +587,7 @@ function GravityGrid() {
         if (frame) cancelAnimationFrame(frame);
         frame = 0;
         pointer.pressed = false;
+        pointer.pressedAt = 0;
       } else schedule();
     };
     const onThemeChange = () => { updateColors(); schedule(); };
