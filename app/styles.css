@@ -72,6 +72,19 @@ html[data-theme="light"] .toast{background:#fff;color:#14213a;border-color:rgba(
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.build-scene [data-build-item],.project-row [data-build-item]{opacity:1!important;filter:none!important;transform:none!important}.edit-selection,.builder-cursor{display:none!important}}
 
 /* The editor outline measures the real element border box, including its border. */
+
+.section-heading h2 .serif-italic{white-space:normal}
+.timeline-top a{display:inline-flex;align-items:center;gap:4px;color:inherit;text-decoration:underline;text-decoration-color:rgba(90,113,143,.4);text-underline-offset:3px;transition:color .2s ease}
+.timeline-top a:hover,.timeline-content>p a:hover{color:var(--action)}
+.timeline-top a .arrow{width:9px;height:9px}
+.timeline-content>p a{color:inherit;text-decoration:underline;text-decoration-color:rgba(var(--action-rgb),.5);text-underline-offset:3px}
+.award-evidence{position:absolute;bottom:14px;left:18px;display:inline-flex;align-items:center;gap:6px;color:var(--muted);font:9px var(--mono);text-decoration:underline;text-decoration-color:rgba(var(--action-rgb),.48);text-underline-offset:3px;transition:color .2s ease}
+.award-evidence:hover{color:var(--action)}
+.award-evidence .arrow{width:10px;height:10px}
+.cert-row>div .cert-link{display:flex;align-items:center;gap:9px;padding:8px 9px;border:1px solid var(--line);color:var(--muted);font-size:11px;text-decoration:none;transition:border-color .2s ease,color .2s ease,transform .2s ease}
+.cert-row>div .cert-link:hover{border-color:var(--action);color:var(--ink);transform:translateY(-2px)}
+.cert-row>div .cert-link i{font:10px var(--mono);color:var(--action);font-style:normal}
+.contact-links a{flex-wrap:wrap}
 .edit-selection{box-sizing:border-box}
 
 .project-disclosure{margin-top:14px}
