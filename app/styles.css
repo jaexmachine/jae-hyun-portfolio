@@ -127,15 +127,16 @@ html.has-custom-cursor,html.has-custom-cursor *{cursor:none!important}
 .custom-cursor[data-pressed="true"] .cursor-star svg{opacity:0;transform:scale(.05) rotate(110deg)}
 .custom-cursor[data-pressed="true"] .cursor-star:after{opacity:0;transform:scale(.2)}
 .custom-cursor[data-pressed="true"] .cursor-blackhole{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0);filter:drop-shadow(0 0 14px rgba(240,120,99,.45))}
-.custom-cursor[data-pressed="true"] .cursor-rocket{opacity:0}
-.custom-cursor[data-pressed="true"] .rocket-cloud-puff{opacity:0!important}
+.custom-cursor[data-blackhole-entry="true"] .cursor-rocket{filter:drop-shadow(0 0 7px rgba(240,120,99,.52))}
+.custom-cursor[data-blackhole-entry="true"][data-entry-side="right"] .cursor-rocket svg{transform:scale(.94,.86) skewX(6deg)}
+.custom-cursor[data-blackhole-entry="true"][data-entry-side="left"] .cursor-rocket svg{transform:scale(.94,.86) skewX(-6deg)}
 @media(hover:hover) and (pointer:fine){.custom-cursor[data-pressed="true"] .cursor-blackhole{transition-delay:.38s;transition-duration:.65s,1.3s}}
 @keyframes blackhole-spin{to{transform:rotate(360deg)}}
 @keyframes blackhole-flow{to{transform:rotate(12deg) scaleX(.86)}}
 .cursor-rocket{z-index:2;width:26px;height:26px;color:var(--ink);transform-origin:center;filter:drop-shadow(0 2px 5px rgba(0,0,0,.22));transition:filter .2s ease,opacity .2s ease}
 .cursor-rocket:before{content:"";position:absolute;z-index:-1;inset:-9px;border-radius:50%;background:radial-gradient(circle,rgba(238,226,207,.34),rgba(238,226,207,.08) 42%,transparent 72%);opacity:0;transform:scale(.55);pointer-events:none}
 .cursor-rocket:after{content:"";position:absolute;left:50%;bottom:-7px;width:7px;height:13px;border-radius:50%;background:linear-gradient(var(--mint),transparent);filter:blur(3px);opacity:0;transform:translateX(-50%) scaleY(.4);transform-origin:top center;pointer-events:none}
-.cursor-rocket svg{position:relative;z-index:1;width:100%;height:100%;overflow:visible}
+.cursor-rocket svg{position:relative;z-index:1;width:100%;height:100%;overflow:visible;transition:transform .6s cubic-bezier(.2,.7,.25,1)}
 .rocket-body,.rocket-fin{fill:currentColor}
 .rocket-fin{transform-origin:14px 14px}
 .rocket-correction-jet{fill:var(--mint);opacity:0;transform:scale(.78);transform-origin:14px 17px;transition:opacity .34s cubic-bezier(.2,.8,.2,1),transform .44s cubic-bezier(.2,.8,.2,1)}

@@ -119,6 +119,7 @@ function CustomCursor() {
     let cloudEmissionAt = 0;
     let emittedCloudCount = 0;
     let previousFrameAt = 0;
+    let pointerPressedAt = 0;
     let scrollDirection: "up" | "down" = "up";
     let scrollUntil = 0;
     let lastScrollY = window.scrollY;
@@ -188,12 +189,16 @@ function CustomCursor() {
       previousFrameAt = now;
       const scrollBoosting = !reducedMotion && now < scrollUntil;
       const pointerMoving = now - lastMoveAt < 200;
+      const blackHolePressed = cursor.getAttribute("data-pressed") === "true";
+      const entryElapsed = pointerPressedAt ? Math.max(0, now - pointerPressedAt - 380) : 0;
+      const entryProgress = !blackHolePressed ? 0 : reducedMotion ? 1 : easeCorrection(Math.min(entryElapsed / 1150, 1));
+      const entryCurve = Math.sin(entryProgress * Math.PI) * 9 * horizontalDirection;
       const engineActive = pointerMoving && movementStartedAt > 0 && now - movementStartedAt >= 175;
       if (pointerMoving && pointerSpeed > 0.4) wasMoving = true;
       else if (wasMoving) { wasMoving = false; pointerSpeed = 0; movementStartedAt = 0; }
       const followDelayActive = !reducedMotion && pointerMoving && movementStartedAt > 0 && now - movementStartedAt < 165;
       const cursorGap = Math.hypot(position.x - rocketPosition.x, position.y + 21 - rocketPosition.y);
-      if (pointerPresent) {
+      if (pointerPresent && !blackHolePressed) {
         if (cursorGap > 48) {
           hasAdjustedOnCatchup = false;
           adjustmentStartedAt = 0;
@@ -201,6 +206,9 @@ function CustomCursor() {
           hasAdjustedOnCatchup = true;
           adjustmentStartedAt = now;
         }
+      } else if (blackHolePressed) {
+        adjustmentStartedAt = 0;
+        hasAdjustedOnCatchup = true;
       }
       const underCursor = cursorGap < 26;
       const settleTime = adjustmentStartedAt ? now - adjustmentStartedAt : 1000;
@@ -223,14 +231,19 @@ function CustomCursor() {
       const visualCorrectionPhase = horizontalDirection < 0
         ? correctionPhase === "right" ? "left" : correctionPhase === "left" ? "right" : correctionPhase
         : correctionPhase;
+      const entryAngle = Math.atan2(position.y - rocketPosition.y, position.x + entryCurve - rocketPosition.x) + Math.PI / 2;
       const targetAngle = scrollBoosting
         ? scrollDirection === "down" ? Math.PI : upright
+        : entryProgress > 0.03 && entryProgress < 0.96
+        ? entryAngle
+        : entryProgress >= 0.96
+        ? upright
         : !pointerPresent
         ? upright + correctionAngle * horizontalDirection
         : pointerMoving || !underCursor ? Math.atan2(position.y - rocketPosition.y, position.x - rocketPosition.x) + Math.PI / 2 : upright;
       const horizontalCorrection = reducedMotion ? 0 : correctionOffset * horizontalDirection;
-      const targetX = !pointerPresent || followDelayActive ? rocketPosition.x : position.x + horizontalCorrection;
-      const targetY = !pointerPresent || followDelayActive ? rocketPosition.y : position.y + 21;
+      const targetX = !pointerPresent || followDelayActive ? rocketPosition.x : position.x + horizontalCorrection + entryCurve;
+      const targetY = !pointerPresent || followDelayActive ? rocketPosition.y : position.y + 21 * (1 - entryProgress);
       const distanceX = targetX - rocketPosition.x;
       const distanceY = targetY - rocketPosition.y;
       const distance = Math.hypot(distanceX, distanceY);
@@ -256,6 +269,8 @@ function CustomCursor() {
       }
       cursor.setAttribute("data-adjusting", adjusting ? "true" : "false");
       cursor.setAttribute("data-engine-active", engineActive ? "true" : "false");
+      cursor.setAttribute("data-blackhole-entry", entryProgress > 0.02 ? "true" : "false");
+      cursor.setAttribute("data-entry-side", horizontalDirection < 0 ? "left" : "right");
       cursor.setAttribute("data-correction-phase", visualCorrectionPhase);
       cursor.setAttribute("data-scrolling", scrollBoosting ? "true" : "false");
       cursor.setAttribute("data-scroll-direction", scrollDirection);
@@ -313,7 +328,8 @@ function CustomCursor() {
 
       const rocketStillMoving = distance > 0.7 || Math.abs(angleDifference) > 0.02 || Math.abs(rocketPosition.angleVelocity) > 0.005;
       const waitingForIgnition = pointerMoving && !engineActive;
-      if (pointerMoving || scrollBoosting || cloudsAnimating || rocketStillMoving || adjusting || waitingForIgnition) frame = requestAnimationFrame(tick);
+      const blackHoleEntering = blackHolePressed && entryProgress < 1;
+      if (pointerMoving || scrollBoosting || cloudsAnimating || rocketStillMoving || adjusting || waitingForIgnition || blackHoleEntering) frame = requestAnimationFrame(tick);
       else frame = 0;
     };
 
@@ -381,10 +397,12 @@ function CustomCursor() {
 
     const onPointerDown = (event: PointerEvent) => {
       onPointerMove(event);
+      pointerPressedAt = performance.now();
       cursor.setAttribute("data-pressed", "true");
     };
     const onPointerUp = (event: PointerEvent) => {
       window.clearTimeout(hideTimer);
+      pointerPressedAt = 0;
       cursor.setAttribute("data-pressed", "false");
       if (event.pointerType === "touch") hideTimer = window.setTimeout(hideCursor, 900);
     };
