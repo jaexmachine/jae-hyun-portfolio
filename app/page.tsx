@@ -906,7 +906,22 @@ export default function Home() {
       <div className="hero-side-note">SCROLL - BUILD SEQUENCE&nbsp;&nbsp; ↓</div>
     </Scene>
 
-    <div className="ticker" aria-label="Areas of interest"><div className="ticker-track"><span>ARTIFICIAL INTELLIGENCE</span><b>✳</b><span>DATA ANALYTICS</span><b>✳</b><span>GEOAI & SPATIAL SYSTEMS</span><b>✳</b><span>INTELLIGENT AUTOMATION</span><b>✳</b><span>ARTIFICIAL INTELLIGENCE</span><b>✳</b><span>DATA ANALYTICS</span><b>✳</b><span>GEOAI & SPATIAL SYSTEMS</span><b>✳</b><span>INTELLIGENT AUTOMATION</span><b>✳</b></div></div>
+    <div className="ticker" role="region" aria-label="Areas of interest">
+      <div className="ticker-track">
+        <div className="ticker-group" role="list">
+          <span role="listitem">ARTIFICIAL INTELLIGENCE</span><b aria-hidden="true">✳</b>
+          <span role="listitem">DATA ANALYTICS</span><b aria-hidden="true">✳</b>
+          <span role="listitem">GEOAI &amp; SPATIAL SYSTEMS</span><b aria-hidden="true">✳</b>
+          <span role="listitem">INTELLIGENT AUTOMATION</span><b aria-hidden="true">✳</b>
+        </div>
+        <div className="ticker-group" aria-hidden="true">
+          <span>ARTIFICIAL INTELLIGENCE</span><b>✳</b>
+          <span>DATA ANALYTICS</span><b>✳</b>
+          <span>GEOAI &amp; SPATIAL SYSTEMS</span><b>✳</b>
+          <span>INTELLIGENT AUTOMATION</span><b>✳</b>
+        </div>
+      </div>
+    </div>
 
     <Scene id="research" className="work-scene">
       <div className="section-wrap">
