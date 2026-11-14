@@ -441,6 +441,10 @@ function GravityGrid() {
     let frame = 0;
     let gridColor = "rgba(244,234,214,.045)";
     let glowColor = "rgba(244,234,214,.035)";
+    let lensColor = "rgba(244,234,214,.9)";
+    let lensHotColor = "rgba(255,250,240,.98)";
+    let blackCoreColor = "rgba(0,0,0,.98)";
+    let blackHoleStrength = 0;
     let warpedX = 0;
     let warpedY = 0;
     const pitch = 58;
@@ -450,6 +454,9 @@ function GravityGrid() {
       const styles = getComputedStyle(canvas);
       gridColor = styles.getPropertyValue("--gravity-grid").trim() || gridColor;
       glowColor = styles.getPropertyValue("--gravity-glow").trim() || glowColor;
+      lensColor = styles.getPropertyValue("--gravity-lens").trim() || lensColor;
+      lensHotColor = styles.getPropertyValue("--gravity-hot").trim() || lensHotColor;
+      blackCoreColor = styles.getPropertyValue("--gravity-core").trim() || blackCoreColor;
     };
 
     const resize = () => {
@@ -508,6 +515,62 @@ function GravityGrid() {
         context.fillStyle = glow;
         context.fillRect(pointer.x - radius, pointer.y - radius, radius * 2, radius * 2);
       }
+
+      if (blackHoleStrength > 0.01) {
+        const hold = Math.min((performance.now() - pointer.pressedAt) / 2200, 1);
+        const growth = 1 - Math.exp(-hold * 2.1);
+        const coreRadius = 7 + growth * 8;
+        const ringRadius = coreRadius * 1.45;
+        const diskRadius = coreRadius * (3.2 + growth * 1.5);
+        const shimmer = 0.92 + Math.sin(performance.now() * 0.008) * 0.08;
+
+        context.save();
+        context.globalAlpha = blackHoleStrength * shimmer;
+
+        const halo = context.createRadialGradient(pointer.x, pointer.y, ringRadius * 0.55, pointer.x, pointer.y, diskRadius * 1.2);
+        halo.addColorStop(0, "rgba(0,0,0,0)");
+        halo.addColorStop(0.48, glowColor);
+        halo.addColorStop(1, "rgba(0,0,0,0)");
+        context.fillStyle = halo;
+        context.fillRect(pointer.x - diskRadius * 1.2, pointer.y - diskRadius * 1.2, diskRadius * 2.4, diskRadius * 2.4);
+
+        context.beginPath();
+        context.ellipse(pointer.x, pointer.y, diskRadius, coreRadius * 0.22, 0, 0, Math.PI * 2);
+        context.strokeStyle = lensColor;
+        context.lineWidth = 1.5 + growth * 1.5;
+        context.shadowColor = lensHotColor;
+        context.shadowBlur = 8 + growth * 12;
+        context.stroke();
+
+        context.beginPath();
+        context.ellipse(pointer.x, pointer.y, ringRadius, ringRadius * 1.08, 0, 0, Math.PI * 2);
+        context.strokeStyle = lensHotColor;
+        context.lineWidth = 1.2 + growth * 1.4;
+        context.shadowBlur = 10 + growth * 12;
+        context.stroke();
+
+        const disk = context.createLinearGradient(pointer.x - diskRadius, pointer.y, pointer.x + diskRadius, pointer.y);
+        disk.addColorStop(0, "rgba(0,0,0,0)");
+        disk.addColorStop(0.28, lensColor);
+        disk.addColorStop(0.5, lensHotColor);
+        disk.addColorStop(0.72, lensColor);
+        disk.addColorStop(1, "rgba(0,0,0,0)");
+        context.beginPath();
+        context.moveTo(pointer.x - diskRadius, pointer.y);
+        context.lineTo(pointer.x + diskRadius, pointer.y);
+        context.strokeStyle = disk;
+        context.lineWidth = 1.4 + growth * 1.5;
+        context.shadowBlur = 12 + growth * 16;
+        context.stroke();
+
+        context.beginPath();
+        context.arc(pointer.x, pointer.y, coreRadius * 0.72, 0, Math.PI * 2);
+        context.fillStyle = blackCoreColor;
+        context.shadowColor = "rgba(0,0,0,.95)";
+        context.shadowBlur = 8;
+        context.fill();
+        context.restore();
+      }
     };
 
     const tick = (now: number) => {
@@ -520,12 +583,14 @@ function GravityGrid() {
       const holdEase = 1 - Math.exp(-hold * 2.1);
       const targetRadius = pointer.present ? (pointer.pressed ? 205 + holdEase * 215 : 142) : 0;
       const targetDepth = pointer.present ? (pointer.pressed ? 34 + holdEase * 47 : 14) : 0;
+      const targetBlackHoleStrength = pointer.pressed ? 1 : 0;
       radius += (targetRadius - radius) * easing;
       depth += (targetDepth - depth) * easing;
+      blackHoleStrength += (targetBlackHoleStrength - blackHoleStrength) * (pointer.pressed ? 0.17 : 0.1);
       draw();
 
       const moving = Math.abs(pointer.targetX - pointer.x) + Math.abs(pointer.targetY - pointer.y) > 0.35;
-      const settling = Math.abs(targetRadius - radius) + Math.abs(targetDepth - depth) > 0.25;
+      const settling = Math.abs(targetRadius - radius) + Math.abs(targetDepth - depth) > 0.25 || Math.abs(targetBlackHoleStrength - blackHoleStrength) > 0.01;
       if (pointer.pressed || moving || settling) frame = requestAnimationFrame(tick);
     };
 
@@ -542,6 +607,8 @@ function GravityGrid() {
       pointer.present = true;
       pointer.targetX = event.clientX;
       pointer.targetY = event.clientY;
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
       pointer.pressed = true;
       pointer.pressedAt = performance.now();
       schedule();
