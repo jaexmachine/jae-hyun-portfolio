@@ -8,8 +8,8 @@
   --color-coral: #f07863;
 }
 
-:root{--gravity-grid:rgba(244,234,214,.06);--gravity-glow:rgba(244,234,214,.04);--gravity-lens:rgba(244,234,214,.9);--gravity-hot:rgba(255,250,240,.98);--gravity-core:rgba(0,0,0,.98)}
-html[data-theme="light"]{--gravity-grid:rgba(23,40,66,.075);--gravity-glow:rgba(90,113,143,.045);--gravity-lens:rgba(23,40,66,.9);--gravity-hot:rgba(240,120,99,.96);--gravity-core:rgba(4,10,20,.98)}
+:root{--gravity-grid:rgba(244,234,214,.06);--gravity-glow:rgba(244,234,214,.04)}
+html[data-theme="light"]{--gravity-grid:rgba(23,40,66,.075);--gravity-glow:rgba(90,113,143,.045)}
 
 :root{--ink:#f4ead6;--muted:#a2b0ca;--dim:#6e7e9d;--bg:#070d1b;--panel:#0c1730;--panel-2:#14213c;--line:rgba(238,226,207,.12);--mint:#e8ddc7;--lav:#d8cdb9;--peach:#e8ddc7;--blue:#d8cdb9;--mono:'DM Mono',monospace;--sans:var(--font-inter),Inter,"Segoe UI",sans-serif;--display:var(--font-inter),Inter,"Segoe UI",sans-serif;--serif:'Playfair Display',serif;scroll-behavior:smooth;scroll-padding-top:80px;color-scheme:dark}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px}body{overflow-x:hidden}a{color:inherit;text-decoration:none}button{font:inherit;color:inherit}::selection{background:rgba(238,226,207,.28);color:#fff}main{position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 52% 4%,rgba(20,38,63,.1),transparent 38%),var(--bg)}
@@ -115,11 +115,24 @@ html.has-custom-cursor,html.has-custom-cursor *{cursor:none!important}
 .custom-cursor[data-pointer-present="false"] .cursor-star{opacity:0;visibility:hidden}
 .cursor-star,.cursor-rocket,.rocket-cloud-puff{position:fixed;top:0;left:0;pointer-events:none;will-change:transform}
 .cursor-star{z-index:3;width:6px;height:6px;color:var(--mint)}
-.cursor-star svg{display:block;width:100%;height:100%;fill:currentColor;filter:drop-shadow(0 0 4px rgba(238,226,207,.9));transition:transform .2s ease}
+.cursor-star svg{display:block;width:100%;height:100%;fill:currentColor;filter:drop-shadow(0 0 4px rgba(238,226,207,.9));transition:transform .2s ease,opacity .18s ease}
 .cursor-star:after{content:"";position:absolute;inset:-7px;border:1px solid var(--mint);border-radius:50%;opacity:0;transform:scale(.45);transition:opacity .2s ease,transform .24s cubic-bezier(.2,.8,.2,1)}
 .custom-cursor[data-hover="true"] .cursor-star svg{transform:scale(1.45)}
 .custom-cursor[data-pressed="true"] .cursor-star:after{opacity:.72;transform:scale(1.15)}
-.cursor-rocket{z-index:2;width:26px;height:26px;color:var(--ink);transform-origin:center;filter:drop-shadow(0 2px 5px rgba(0,0,0,.22));transition:filter .2s ease}
+.cursor-blackhole{position:absolute;left:50%;top:50%;width:46px;height:46px;opacity:0;transform:translate(-50%,-50%) scale(.08);transform-origin:center;filter:drop-shadow(0 0 9px rgba(244,234,214,.35));transition:opacity .2s ease,transform .4s cubic-bezier(.4,0,.7,.2);pointer-events:none}
+.cursor-blackhole i{position:absolute;display:block}
+.blackhole-ring{inset:8%;border:1.5px solid transparent;border-top-color:#fff7e9;border-right-color:#f07863;border-radius:50%;box-shadow:0 0 7px rgba(255,247,233,.55),inset 0 0 5px rgba(240,120,99,.28);animation:blackhole-spin 3s linear infinite}
+.blackhole-disk{z-index:2;left:-12%;top:46%;width:124%;height:8%;border-radius:50%;background:linear-gradient(90deg,transparent,#f4ead6 28%,#f07863 50%,#f4ead6 72%,transparent);box-shadow:0 0 6px rgba(255,247,233,.8),0 0 12px rgba(240,120,99,.45);transform:rotate(-12deg);animation:blackhole-flow 2.2s ease-in-out infinite alternate}
+.blackhole-core{z-index:3;left:37%;top:37%;width:26%;height:26%;border-radius:50%;background:#03050a;box-shadow:0 0 8px rgba(0,0,0,.95),0 0 4px rgba(255,247,233,.5)}
+.custom-cursor[data-pressed="true"] .cursor-star svg{opacity:0;transform:scale(.05) rotate(110deg)}
+.custom-cursor[data-pressed="true"] .cursor-star:after{opacity:0;transform:scale(.2)}
+.custom-cursor[data-pressed="true"] .cursor-blackhole{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0);filter:drop-shadow(0 0 14px rgba(240,120,99,.45))}
+.custom-cursor[data-pressed="true"] .cursor-rocket{opacity:0}
+.custom-cursor[data-pressed="true"] .rocket-cloud-puff{opacity:0!important}
+@media(hover:hover) and (pointer:fine){.custom-cursor[data-pressed="true"] .cursor-blackhole{transition-delay:.38s;transition-duration:.65s,1.3s}}
+@keyframes blackhole-spin{to{transform:rotate(360deg)}}
+@keyframes blackhole-flow{to{transform:rotate(12deg) scaleX(.86)}}
+.cursor-rocket{z-index:2;width:26px;height:26px;color:var(--ink);transform-origin:center;filter:drop-shadow(0 2px 5px rgba(0,0,0,.22));transition:filter .2s ease,opacity .2s ease}
 .cursor-rocket:before{content:"";position:absolute;z-index:-1;inset:-9px;border-radius:50%;background:radial-gradient(circle,rgba(238,226,207,.34),rgba(238,226,207,.08) 42%,transparent 72%);opacity:0;transform:scale(.55);pointer-events:none}
 .cursor-rocket:after{content:"";position:absolute;left:50%;bottom:-7px;width:7px;height:13px;border-radius:50%;background:linear-gradient(var(--mint),transparent);filter:blur(3px);opacity:0;transform:translateX(-50%) scaleY(.4);transform-origin:top center;pointer-events:none}
 .cursor-rocket svg{position:relative;z-index:1;width:100%;height:100%;overflow:visible}
@@ -153,7 +166,7 @@ html[data-theme="light"] .rocket-cloud-puff{background:radial-gradient(ellipse,r
 @keyframes rocket-gimbal{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
 @keyframes rocket-correction-glow{from{transform:scale(.62);opacity:.5}to{transform:scale(1.08);opacity:1}}
 @keyframes rocket-plume{from{transform:translateX(-50%) scaleY(.45);opacity:.5}to{transform:translateX(-50%) scaleY(1.3);opacity:1}}
-@media(prefers-reduced-motion:reduce){.rocket-cloud-puff{display:none}.rocket-flame,.rocket-fin,.rocket-correction-jet{animation:none!important}.cursor-rocket:before,.cursor-rocket:after{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.rocket-cloud-puff{display:none}.rocket-flame,.rocket-fin,.rocket-correction-jet{animation:none!important}.cursor-rocket:before,.cursor-rocket:after{animation:none!important}.blackhole-ring,.blackhole-disk{animation:none!important}.cursor-blackhole{transition-duration:.01ms!important;transition-delay:0s!important}}
 
 /* Navy, cream and coral system with a more readable type scale. */
 :root{

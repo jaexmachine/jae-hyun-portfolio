@@ -417,7 +417,7 @@ function CustomCursor() {
 
   return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-pointer-present="false" data-hover="false" data-pressed="false" data-adjusting="false" data-engine-active="false" data-scrolling="false" data-scroll-direction="up" data-correction-phase="none">
     {Array.from({ length: 14 }, (_, index) => <span className="rocket-cloud-puff" key={index} ref={(node) => { cloudRefs.current[index] = node; }} />)}
-    <span className="cursor-star" ref={starRef}><svg viewBox="0 0 12 12"><path d="M6 0.5 7.35 4.65 11.5 6 7.35 7.35 6 11.5 4.65 7.35.5 6 4.65 4.65 6 .5Z" /></svg></span>
+    <span className="cursor-star" ref={starRef}><svg viewBox="0 0 12 12"><path d="M6 0.5 7.35 4.65 11.5 6 7.35 7.35 6 11.5 4.65 7.35.5 6 4.65 4.65 6 .5Z" /></svg><span className="cursor-blackhole"><i className="blackhole-ring"/><i className="blackhole-disk"/><i className="blackhole-core"/></span></span>
     <span className="cursor-rocket" ref={rocketRef}><svg viewBox="0 0 28 28"><path className="rocket-fin" d="M9 13.5 4.5 20.5 9 19.3ZM19 13.5l4.5 7-4.5-1.2Z"/><path className="rocket-correction-jet" d="M8.8 15.5 6.3 18.5l2.6-.8Zm10.4 0 2.5 3-2.6-.8Z"/><path className="rocket-body" d="M14 2C10 5.6 8.5 10.5 8.5 17v2h11v-2C19.5 10.5 18 5.6 14 2Z"/><circle className="rocket-window" cx="14" cy="10.5" r="2.1"/><path className="rocket-flame" d="M11 19 14 26 17 19Z"/></svg></span>
   </div>;
 }
@@ -441,10 +441,6 @@ function GravityGrid() {
     let frame = 0;
     let gridColor = "rgba(244,234,214,.045)";
     let glowColor = "rgba(244,234,214,.035)";
-    let lensColor = "rgba(244,234,214,.9)";
-    let lensHotColor = "rgba(255,250,240,.98)";
-    let blackCoreColor = "rgba(0,0,0,.98)";
-    let blackHoleStrength = 0;
     let warpedX = 0;
     let warpedY = 0;
     const pitch = 58;
@@ -454,9 +450,6 @@ function GravityGrid() {
       const styles = getComputedStyle(canvas);
       gridColor = styles.getPropertyValue("--gravity-grid").trim() || gridColor;
       glowColor = styles.getPropertyValue("--gravity-glow").trim() || glowColor;
-      lensColor = styles.getPropertyValue("--gravity-lens").trim() || lensColor;
-      lensHotColor = styles.getPropertyValue("--gravity-hot").trim() || lensHotColor;
-      blackCoreColor = styles.getPropertyValue("--gravity-core").trim() || blackCoreColor;
     };
 
     const resize = () => {
@@ -516,61 +509,6 @@ function GravityGrid() {
         context.fillRect(pointer.x - radius, pointer.y - radius, radius * 2, radius * 2);
       }
 
-      if (blackHoleStrength > 0.01) {
-        const hold = Math.min((performance.now() - pointer.pressedAt) / 2200, 1);
-        const growth = 1 - Math.exp(-hold * 2.1);
-        const coreRadius = 7 + growth * 8;
-        const ringRadius = coreRadius * 1.45;
-        const diskRadius = coreRadius * (3.2 + growth * 1.5);
-        const shimmer = 0.92 + Math.sin(performance.now() * 0.008) * 0.08;
-
-        context.save();
-        context.globalAlpha = blackHoleStrength * shimmer;
-
-        const halo = context.createRadialGradient(pointer.x, pointer.y, ringRadius * 0.55, pointer.x, pointer.y, diskRadius * 1.2);
-        halo.addColorStop(0, "rgba(0,0,0,0)");
-        halo.addColorStop(0.48, glowColor);
-        halo.addColorStop(1, "rgba(0,0,0,0)");
-        context.fillStyle = halo;
-        context.fillRect(pointer.x - diskRadius * 1.2, pointer.y - diskRadius * 1.2, diskRadius * 2.4, diskRadius * 2.4);
-
-        context.beginPath();
-        context.ellipse(pointer.x, pointer.y, diskRadius, coreRadius * 0.22, 0, 0, Math.PI * 2);
-        context.strokeStyle = lensColor;
-        context.lineWidth = 1.5 + growth * 1.5;
-        context.shadowColor = lensHotColor;
-        context.shadowBlur = 8 + growth * 12;
-        context.stroke();
-
-        context.beginPath();
-        context.ellipse(pointer.x, pointer.y, ringRadius, ringRadius * 1.08, 0, 0, Math.PI * 2);
-        context.strokeStyle = lensHotColor;
-        context.lineWidth = 1.2 + growth * 1.4;
-        context.shadowBlur = 10 + growth * 12;
-        context.stroke();
-
-        const disk = context.createLinearGradient(pointer.x - diskRadius, pointer.y, pointer.x + diskRadius, pointer.y);
-        disk.addColorStop(0, "rgba(0,0,0,0)");
-        disk.addColorStop(0.28, lensColor);
-        disk.addColorStop(0.5, lensHotColor);
-        disk.addColorStop(0.72, lensColor);
-        disk.addColorStop(1, "rgba(0,0,0,0)");
-        context.beginPath();
-        context.moveTo(pointer.x - diskRadius, pointer.y);
-        context.lineTo(pointer.x + diskRadius, pointer.y);
-        context.strokeStyle = disk;
-        context.lineWidth = 1.4 + growth * 1.5;
-        context.shadowBlur = 12 + growth * 16;
-        context.stroke();
-
-        context.beginPath();
-        context.arc(pointer.x, pointer.y, coreRadius * 0.72, 0, Math.PI * 2);
-        context.fillStyle = blackCoreColor;
-        context.shadowColor = "rgba(0,0,0,.95)";
-        context.shadowBlur = 8;
-        context.fill();
-        context.restore();
-      }
     };
 
     const tick = (now: number) => {
@@ -583,14 +521,12 @@ function GravityGrid() {
       const holdEase = 1 - Math.exp(-hold * 2.1);
       const targetRadius = pointer.present ? (pointer.pressed ? 205 + holdEase * 215 : 142) : 0;
       const targetDepth = pointer.present ? (pointer.pressed ? 34 + holdEase * 47 : 14) : 0;
-      const targetBlackHoleStrength = pointer.pressed ? 1 : 0;
       radius += (targetRadius - radius) * easing;
       depth += (targetDepth - depth) * easing;
-      blackHoleStrength += (targetBlackHoleStrength - blackHoleStrength) * (pointer.pressed ? 0.17 : 0.1);
       draw();
 
       const moving = Math.abs(pointer.targetX - pointer.x) + Math.abs(pointer.targetY - pointer.y) > 0.35;
-      const settling = Math.abs(targetRadius - radius) + Math.abs(targetDepth - depth) > 0.25 || Math.abs(targetBlackHoleStrength - blackHoleStrength) > 0.01;
+      const settling = Math.abs(targetRadius - radius) + Math.abs(targetDepth - depth) > 0.25;
       if (pointer.pressed || moving || settling) frame = requestAnimationFrame(tick);
     };
 
