@@ -270,6 +270,7 @@ function CustomCursor() {
       cursor.setAttribute("data-adjusting", adjusting ? "true" : "false");
       cursor.setAttribute("data-engine-active", engineActive ? "true" : "false");
       cursor.setAttribute("data-blackhole-entry", entryProgress > 0.02 ? "true" : "false");
+      cursor.setAttribute("data-entry-phase", entryProgress > 0.36 ? "swirl" : entryProgress > 0.02 ? "approach" : "none");
       cursor.setAttribute("data-entry-side", horizontalDirection < 0 ? "left" : "right");
       cursor.setAttribute("data-correction-phase", visualCorrectionPhase);
       cursor.setAttribute("data-scrolling", scrollBoosting ? "true" : "false");
@@ -398,11 +399,13 @@ function CustomCursor() {
     const onPointerDown = (event: PointerEvent) => {
       onPointerMove(event);
       pointerPressedAt = performance.now();
+      cursor.setAttribute("data-entry-phase", "none");
       cursor.setAttribute("data-pressed", "true");
     };
     const onPointerUp = (event: PointerEvent) => {
       window.clearTimeout(hideTimer);
       pointerPressedAt = 0;
+      cursor.setAttribute("data-entry-phase", "none");
       cursor.setAttribute("data-pressed", "false");
       if (event.pointerType === "touch") hideTimer = window.setTimeout(hideCursor, 900);
     };
@@ -435,7 +438,7 @@ function CustomCursor() {
 
   return <div className="custom-cursor" aria-hidden="true" data-visible="false" data-pointer-present="false" data-hover="false" data-pressed="false" data-adjusting="false" data-engine-active="false" data-scrolling="false" data-scroll-direction="up" data-correction-phase="none">
     {Array.from({ length: 14 }, (_, index) => <span className="rocket-cloud-puff" key={index} ref={(node) => { cloudRefs.current[index] = node; }} />)}
-    <span className="cursor-star" ref={starRef}><svg viewBox="0 0 12 12"><path d="M6 0.5 7.35 4.65 11.5 6 7.35 7.35 6 11.5 4.65 7.35.5 6 4.65 4.65 6 .5Z" /></svg><span className="cursor-blackhole"><i className="blackhole-ring"/><i className="blackhole-disk"/><i className="blackhole-core"/></span></span>
+    <span className="cursor-star" ref={starRef}><svg viewBox="0 0 12 12"><path d="M6 0.5 7.35 4.65 11.5 6 7.35 7.35 6 11.5 4.65 7.35.5 6 4.65 4.65 6 .5Z" /></svg><span className="cursor-blackhole"><i className="blackhole-ring"/><i className="blackhole-disk"/><i className="blackhole-core"/><i className="blackhole-swirl"/></span></span>
     <span className="cursor-rocket" ref={rocketRef}><svg viewBox="0 0 28 28"><path className="rocket-fin" d="M9 13.5 4.5 20.5 9 19.3ZM19 13.5l4.5 7-4.5-1.2Z"/><path className="rocket-correction-jet" d="M8.8 15.5 6.3 18.5l2.6-.8Zm10.4 0 2.5 3-2.6-.8Z"/><path className="rocket-body" d="M14 2C10 5.6 8.5 10.5 8.5 17v2h11v-2C19.5 10.5 18 5.6 14 2Z"/><circle className="rocket-window" cx="14" cy="10.5" r="2.1"/><path className="rocket-flame" d="M11 19 14 26 17 19Z"/></svg></span>
   </div>;
 }
