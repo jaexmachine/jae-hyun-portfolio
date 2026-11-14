@@ -120,6 +120,7 @@ function CustomCursor() {
     let emittedCloudCount = 0;
     let previousFrameAt = 0;
     let pointerPressedAt = 0;
+    let releaseTimer = 0;
     let scrollDirection: "up" | "down" = "up";
     let scrollUntil = 0;
     let lastScrollY = window.scrollY;
@@ -135,6 +136,10 @@ function CustomCursor() {
       cursor.setAttribute("data-adjusting", "false");
       cursor.setAttribute("data-correction-phase", "none");
       cursor.setAttribute("data-scrolling", "false");
+      cursor.setAttribute("data-entry-phase", "none");
+      cursor.setAttribute("data-blackhole-entry", "false");
+      window.clearTimeout(releaseTimer);
+      releaseTimer = 0;
       root.classList.remove("has-custom-cursor");
       initialized = false;
       wasMoving = false;
@@ -162,6 +167,10 @@ function CustomCursor() {
       cursor.setAttribute("data-pointer-present", "false");
       cursor.setAttribute("data-hover", "false");
       cursor.setAttribute("data-pressed", "false");
+      cursor.setAttribute("data-entry-phase", "none");
+      cursor.setAttribute("data-blackhole-entry", "false");
+      window.clearTimeout(releaseTimer);
+      releaseTimer = 0;
       cursor.setAttribute("data-engine-active", "false");
       root.classList.remove("has-custom-cursor");
       wasMoving = false;
@@ -270,7 +279,8 @@ function CustomCursor() {
       cursor.setAttribute("data-adjusting", adjusting ? "true" : "false");
       cursor.setAttribute("data-engine-active", engineActive ? "true" : "false");
       cursor.setAttribute("data-blackhole-entry", entryProgress > 0.02 ? "true" : "false");
-      cursor.setAttribute("data-entry-phase", entryProgress > 0.36 ? "swirl" : entryProgress > 0.02 ? "approach" : "none");
+      const releasingFromSwirl = !blackHolePressed && releaseTimer !== 0;
+      cursor.setAttribute("data-entry-phase", releasingFromSwirl ? "release" : entryProgress > 0.36 ? "swirl" : entryProgress > 0.02 ? "approach" : "none");
       cursor.setAttribute("data-entry-side", horizontalDirection < 0 ? "left" : "right");
       cursor.setAttribute("data-correction-phase", visualCorrectionPhase);
       cursor.setAttribute("data-scrolling", scrollBoosting ? "true" : "false");
@@ -398,15 +408,26 @@ function CustomCursor() {
 
     const onPointerDown = (event: PointerEvent) => {
       onPointerMove(event);
+      window.clearTimeout(releaseTimer);
+      releaseTimer = 0;
       pointerPressedAt = performance.now();
       cursor.setAttribute("data-entry-phase", "none");
       cursor.setAttribute("data-pressed", "true");
     };
     const onPointerUp = (event: PointerEvent) => {
       window.clearTimeout(hideTimer);
+      const wasSwirling = cursor.getAttribute("data-entry-phase") === "swirl";
       pointerPressedAt = 0;
-      cursor.setAttribute("data-entry-phase", "none");
+      cursor.setAttribute("data-entry-phase", wasSwirling ? "release" : "none");
       cursor.setAttribute("data-pressed", "false");
+      if (wasSwirling) {
+        releaseTimer = window.setTimeout(() => {
+          cursor.setAttribute("data-entry-phase", "none");
+          releaseTimer = 0;
+        }, 760);
+      }
+      active = true;
+      if (!frame) frame = requestAnimationFrame(tick);
       if (event.pointerType === "touch") hideTimer = window.setTimeout(hideCursor, 900);
     };
     const onPointerLeave = () => { if (pointerPresent) pauseCursor(); };
