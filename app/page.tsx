@@ -501,7 +501,7 @@ function GravityGrid() {
 
     const draw = () => {
       context.clearRect(0, 0, width, height);
-      const gridActive = pointer.present && (!pointer.pressed || radius > 0.5);
+      const gridActive = pointer.present;
       const activeRadius = gridActive ? radius : 0;
       const activeDepth = gridActive ? depth : 0;
       context.beginPath();
@@ -523,7 +523,7 @@ function GravityGrid() {
       context.lineWidth = 1;
       context.stroke();
 
-      if (gridActive && !pointer.pressed && radius > 0) {
+      if (gridActive && radius > 0) {
         const glow = context.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, radius * 0.9);
         glow.addColorStop(0, glowColor);
         glow.addColorStop(1, "rgba(0,0,0,0)");
@@ -541,8 +541,8 @@ function GravityGrid() {
 
       const hold = pointer.pressed ? Math.max(0, Math.min((now - pointer.pressedAt - 380) / 1150, 1)) : 0;
       const lensReveal = hold * hold * (3 - 2 * hold);
-      const targetRadius = pointer.present ? pointer.pressed ? 88 * lensReveal : 142 : 0;
-      const targetDepth = pointer.present ? pointer.pressed ? 44 * lensReveal : 14 : 0;
+      const targetRadius = pointer.present ? 142 + (pointer.pressed ? lensReveal * 65 : 0) : 0;
+      const targetDepth = pointer.present ? 14 + (pointer.pressed ? lensReveal * 30 : 0) : 0;
       radius += (targetRadius - radius) * easing;
       depth += (targetDepth - depth) * easing;
       draw();
