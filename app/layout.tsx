@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   description: "A portfolio assembled in real time. Jae Hyun Tukushima — AI, data, and geospatial systems.",
   icons: {
     icon: [
-      { url: "/rocket-j-light.png", type: "image/png", media: "(prefers-color-scheme: light)" },
-      { url: "/rocket-j-dark.png", type: "image/png", media: "(prefers-color-scheme: dark)" },
+      { url: "/rocket-j-light-icon.png", type: "image/png", sizes: "128x128", media: "(prefers-color-scheme: light)" },
+      { url: "/rocket-j-dark-icon.png", type: "image/png", sizes: "128x128", media: "(prefers-color-scheme: dark)" },
     ],
   },
   openGraph: {
