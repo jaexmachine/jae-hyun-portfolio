@@ -451,3 +451,5 @@ html[data-theme="light"] .visual-serial{color:var(--visual-ink)}
 html[data-theme="light"] .button-quiet:hover{border-color:var(--ink);background:rgba(23,40,66,.05)}
 
 @media(prefers-reduced-motion:reduce){.ticker-track{width:100%;animation:none;will-change:auto}.ticker-group{width:100%;justify-content:space-around;flex-wrap:wrap;padding:0}.ticker-group[aria-hidden="true"]{display:none}}
+
+@media(prefers-reduced-motion:no-preference){main.is-initializing #home .hero-copy h1{position:fixed;z-index:30;inset:0;width:100vw;height:100vh;height:100svh;max-width:none;margin:0;display:grid;place-content:center;transform:none;transform-origin:center;text-align:center;pointer-events:none}main.is-initializing #home .hero-essentials,main.is-initializing #home .hero-footnote,main.is-initializing #home .hero-art,main.is-initializing #home .hero-side-note,main.is-initializing #home .edit-selection,main.is-initializing #home .builder-cursor,main.is-initializing #home .scene-progress{visibility:hidden;opacity:0}}

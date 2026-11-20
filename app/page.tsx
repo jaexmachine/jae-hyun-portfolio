@@ -198,6 +198,9 @@ export default function Home() {
           const sideNote = scene.querySelector<HTMLElement>(".hero-side-note");
           if (!headline || !art) return;
 
+          // Measure the natural layout before the CSS-only first frame is cleared.
+          root.current?.classList.remove("is-initializing");
+
           const details = [
             heroEssentials,
             profileTag,
@@ -316,7 +319,7 @@ export default function Home() {
     document.querySelector("#research")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  return <main ref={root}>
+  return <main ref={root} className={ready ? "" : "is-initializing"}>
     {pointerEffectsReady && <GravityGrid />}
     <div className="ambient-orb orb-a" /><div className="ambient-orb orb-b" />
     <header className={`topbar${navHidden ? " is-hidden" : ""}`}>

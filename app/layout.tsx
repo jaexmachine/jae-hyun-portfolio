@@ -25,5 +25,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en" className={inter.variable}><body>{children}</body></html>;
+  return <html lang="en" className={inter.variable}><body>
+    <noscript><style>{`main.is-initializing #home .hero-copy h1{position:static;inset:auto;left:auto;top:auto;display:block;height:auto;width:auto;transform:none;text-align:left;max-width:none}main.is-initializing #home .hero-essentials,main.is-initializing #home .hero-footnote,main.is-initializing #home .hero-art,main.is-initializing #home .hero-side-note,main.is-initializing #home .edit-selection,main.is-initializing #home .builder-cursor,main.is-initializing #home .scene-progress{visibility:visible!important;opacity:1!important}`}</style></noscript>
+    {children}
+  </body></html>;
 }
