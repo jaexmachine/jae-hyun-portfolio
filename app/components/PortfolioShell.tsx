@@ -88,8 +88,8 @@ export default function PortfolioShell({ children }: { children: ReactNode }) {
           if (cursors[1] && details[1]) gsap.set(cursors[1], { x: box(details[1]).x - 48, y: box(details[1]).y + box(details[1]).height + 20, autoAlpha: 0 });
 
           const timeline = gsap.timeline({ defaults: { ease: "power2.inOut" }, scrollTrigger: {
-            trigger: scene, start: "top top", end: () => `+=${Math.max(900, window.innerHeight * 1.28)}`,
-            scrub: 0.8, pin: true, pinSpacing: true, invalidateOnRefresh: true,
+            trigger: scene, start: "top top", end: () => `+=${Math.max(1260, window.innerHeight * 1.8)}`,
+            scrub: 1.05, pin: true, pinSpacing: true, invalidateOnRefresh: true,
             onLeave: () => {
               scene.classList.add("is-built");
               gsap.set(details, { autoAlpha: 1, visibility: "visible" });
@@ -127,8 +127,8 @@ export default function PortfolioShell({ children }: { children: ReactNode }) {
         if (cursors[1]) gsap.set(cursors[1], { x: firstBox.x - 50, y: firstBox.y + firstBox.height + 20, autoAlpha: 0 });
 
         const timeline = gsap.timeline({ defaults: { ease: "power2.inOut" }, scrollTrigger: {
-          trigger: scene, start: "top top", end: () => `+=${Math.max(760, window.innerHeight * 1.12)}`,
-          scrub: 0.8, pin: true, pinSpacing: true, invalidateOnRefresh: true,
+          trigger: scene, start: "top top", end: () => `+=${Math.max(1065, window.innerHeight * 1.6)}`,
+          scrub: 1, pin: true, pinSpacing: true, invalidateOnRefresh: true,
           onLeave: () => {
             scene.classList.add("is-built");
             gsap.set(items, { autoAlpha: 1, visibility: "visible" });
