@@ -87,6 +87,7 @@ function ProjectDisclosure({ id, children }: { id: string; children: React.React
 
 export default function Home() {
   const root = useRef<HTMLElement>(null);
+  const sceneObserverRef = useRef<IntersectionObserver | null>(null);
   const [ready, setReady] = useState(false);
   const [pointerEffectsReady, setPointerEffectsReady] = useState(false);
   const [toast, setToast] = useState("");
@@ -169,9 +170,11 @@ export default function Home() {
   useLayoutEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) { setReady(true); return; }
+    let sceneObserver: IntersectionObserver | undefined;
+    const sceneContexts: Array<{ revert: () => void }> = [];
     const ctx = gsap.context(() => {
       const scenes = gsap.utils.toArray<HTMLElement>("[data-build-scene]");
-      scenes.forEach((scene) => {
+      const initializeScene = (scene: HTMLElement) => {
         const items = gsap.utils.toArray<HTMLElement>("[data-build-item]", scene);
         const frame = scene.querySelector<HTMLElement>(".edit-selection");
         const cursors = [scene.querySelector<HTMLElement>(".cursor-one"), scene.querySelector<HTMLElement>(".cursor-two")];
@@ -289,11 +292,36 @@ export default function Home() {
           .to(frame, { autoAlpha: 0, scale: 1.025, duration: 0.12 }, buildEnd + 0.04)
           .to(cursors, { autoAlpha: 0, duration: 0.12 }, buildEnd + 0.04);
         if (progressLine) timeline.to(progressLine, { scaleX: 1, duration: 0.98, ease: "none" }, 0);
-      });
+      };
+
+      const homeScene = scenes.find((scene) => scene.id === "home");
+      if (homeScene) initializeScene(homeScene);
+
+      const deferredScenes = scenes.filter((scene) => scene !== homeScene);
+      if ("IntersectionObserver" in window) {
+        sceneObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            const scene = entry.target as HTMLElement;
+            sceneObserver?.unobserve(scene);
+            sceneContexts.push(gsap.context(() => initializeScene(scene), scene));
+          });
+        }, { rootMargin: "120% 0px" });
+        sceneObserverRef.current = sceneObserver;
+        deferredScenes.forEach((scene) => sceneObserver?.observe(scene));
+      } else {
+        deferredScenes.forEach(initializeScene);
+      }
+
       gsap.fromTo(".ambient-orb", { y: 0 }, { y: -110, ease: "none", scrollTrigger: { trigger: root.current, start: "top top", end: "bottom bottom", scrub: 1 } });
       setReady(true);
     }, root);
-    return () => ctx.revert();
+    return () => {
+      sceneObserver?.disconnect();
+      sceneObserverRef.current = null;
+      sceneContexts.forEach((sceneContext) => sceneContext.revert());
+      ctx.revert();
+    };
   }, []);
 
   useEffect(() => {
@@ -312,6 +340,8 @@ export default function Home() {
     catch { window.location.href = "mailto:18jaehyun05@gmail.com"; }
   };
   const finishBuild = () => {
+    sceneObserverRef.current?.disconnect();
+    sceneObserverRef.current = null;
     ScrollTrigger.getAll().forEach((trigger) => trigger.kill(true));
     gsap.set("[data-build-item]", { autoAlpha: 1, visibility: "visible", clearProps: "filter,transform" });
     gsap.set(".edit-selection,.builder-cursor", { autoAlpha: 0 });
