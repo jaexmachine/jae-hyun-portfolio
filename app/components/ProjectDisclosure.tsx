@@ -12,6 +12,7 @@ export default function ProjectDisclosure({ id, children }: { id: string; childr
       return;
     }
 
+    if (window.matchMedia("(pointer: coarse)").matches) return;
     void import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => ScrollTrigger.refresh());
   }, [open]);
 

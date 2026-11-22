@@ -20,7 +20,11 @@ export default function PortfolioShell({ children }: { children: ReactNode }) {
 
   useLayoutEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) { root.current?.classList.remove("is-initializing"); document.documentElement.classList.add("motion-ready"); return; }
+    const finePointer = window.matchMedia("(pointer: fine)").matches;
+    if (reduce || !finePointer) {
+      root.current?.classList.remove("is-initializing");
+      return;
+    }
     let cancelled = false;
     let sceneObserver: IntersectionObserver | undefined;
     const sceneContexts: Array<{ revert: () => void }> = [];
@@ -338,7 +342,7 @@ export default function PortfolioShell({ children }: { children: ReactNode }) {
     }, { rootMargin: "-42% 0px -48% 0px", threshold: 0 });
     sections.forEach((section) => navObserver.observe(section));
 
-    const supportsHover = window.matchMedia("(any-hover: hover)").matches;
+    const supportsHover = window.matchMedia("(pointer: fine) and (any-hover: hover)").matches;
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const enablePointerEffects = () => setPointerEffectsReady(true);
     if (supportsHover && !prefersReducedMotion) {
